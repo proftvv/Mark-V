@@ -21,24 +21,35 @@ Mark-V, belirli bir tuşu ayarlanabilir aralıklarla otomatik olarak basan bir m
 
 ## 🚀 Kurulum
 
-### Gereksinimler
+### Seçenek 1: EXE Dosyası (Önerilen)
+1. [Releases](https://github.com/proftvv/Mark-V/releases) sayfasından en son `MarkV.exe` dosyasını indirin
+2. İndirilen EXE'yi çalıştırın
+3. Python kurulumuna gerek yok!
+
+### Seçenek 2: Kaynak Koddan Çalıştırma
+
+#### Gereksinimler
 - Python 3.8 veya üzeri
 - pip paket yöneticisi
 
-### Bağımlılıkları Yükleme
+#### Bağımlılıkları Yükleme
 ```bash
 pip install -r requirements.txt
 ```
 
-### Programı Çalıştırma
+#### Programı Çalıştırma
 ```bash
 python main.py
 ```
 
-### EXE Oluşturma
+### Seçenek 3: Kendi EXE'nizi Oluşturma
 ```bash
-pyinstaller --onefile --windowed --name=MarkV main.py
+pip install -r requirements.txt
+pyinstaller --onefile --windowed --name=MarkV --clean main.py
 ```
+Oluşturulan EXE: `dist/MarkV.exe`
+
+Detaylı build bilgisi için [BUILD.md](BUILD.md) dosyasına bakınız.
 
 ## 🎮 Kullanım
 
