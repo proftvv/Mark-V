@@ -1,5 +1,61 @@
 # Versiyon Geçmişi
 
+## v1.0.0 - Stable Release 🎉 (23 Aralık 2025)
+
+### İlk Stabil Sürüm
+Mark-V'nin ilk resmi stable sürümü! Tüm core özellikler tamamlandı ve test edildi.
+
+### Özellikler:
+- ⌨️ **Tuş Basma Sistemi**
+  - Herhangi bir tuşu otomatik basma
+  - F9 hotkey ile başlat/durdur
+  - Otomatik tuş yakalama (Yakala butonu)
+- ⏱️ **Zaman Kontrolü**
+  - Milisaniye veya saniye seçimi
+  - Rastgele aralık desteği (Min-Max)
+  - Hassas zamanlama
+- 🔢 **Tekrar Sistemi**
+  - Sonsuz mod
+  - Belirli tekrar sayısı
+  - Canlı sayaç göstergesi
+- ⏸️ **Kontrol Özellikleri**
+  - Başlat/Duraklat/Durdur butonları
+  - Duraklat sırasında state korunması
+  - Güvenli kapatma kontrolü
+- 📊 **İstatistikler**
+  - Geçen süre göstergesi (HH:MM:SS)
+  - Toplam basış sayısı (oturum)
+  - Kalan tekrar sayısı
+- 💾 **Ayarlar**
+  - Otomatik kaydetme
+  - JSON formatında config
+  - Uygulama yeniden açıldığında ayarları hatırlama
+- 🎨 **Kullanıcı Arayüzü**
+  - Temiz ve basit tasarım
+  - Türkçe arayüz
+  - Emoji ikonlar
+  - Özel pencere ikonu
+- 🔗 **Diğer**
+  - GitHub profil linki
+  - Developer bilgisi
+  - MIT Lisans
+
+### Teknik Detaylar:
+- Python 3.14.0
+- Tkinter GUI
+- pynput keyboard control
+- PyInstaller ile EXE paketleme
+- ~10MB EXE boyutu
+- Windows 10/11 uyumlu
+
+### Gelecek Sürümler için Planlar:
+- Profil sistemi (birden fazla konfigürasyon)
+- İleri seviye istatistikler
+- Import/Export ayarları
+- Kullanıcı rehberi
+
+---
+
 ## v0.0.9-R5 (23 Aralık 2025)
 
 ### Değişiklikler:

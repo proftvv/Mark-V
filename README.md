@@ -1,35 +1,42 @@
 # Mark-V - Macro Tuş Basma Programı
 
-![Version](https://img.shields.io/badge/version-0.0.9--R5-blue)
-![Python](https://img.shields.io/badge/python-3.8+-green)
+![Version](https://img.shields.io/badge/version-1.0.0-brightgreen)
+![Status](https://img.shields.io/badge/status-stable-success)
+![Python](https://img.shields.io/badge/python-3.8+-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
+![Platform](https://img.shields.io/badge/platform-Windows-blue)
 
 ## 📖 Açıklama
 
-Mark-V, belirli bir tuşu ayarlanabilir aralıklarla otomatik olarak basan bir macro programıdır. 
+Mark-V, belirli bir tuşu ayarlanabilir aralıklarla otomatik olarak basan profesyonel bir macro programıdır. Windows için optimize edilmiş, kullanıcı dostu arayüze sahip ve güçlü özellikleriyle oyun ve otomasyon ihtiyaçlarınız için ideal bir çözüm sunar.
 
 ## ✨ Özellikler
 
--  **Gelişmiş istatistikler** (geçen süre, toplam basış)
-- 💾 **Otomatik kaydetme** (ayarlar anında kaydedilir)
-- 🔢 Tekrar sayısı ayarlama (sonsuz veya sınırlı)
-- 🎲 Rastgele aralık (Min-Max değer aralığı)
-- 📊 Canlı sayaç (basış & kalan)
-- ⏸️ Duraklat/Devam özelliği
-- ⏱️ Basma aralığını ms veya saniye olarak ayarlama
-- 🎯 Otomatik tuş yakalama (Yakala butonu ile)
-- ⌨️ İstediğiniz tuşu seçebilme
-- ⏰ Basma aralığını milisaniye veya saniye cinsinden ayarlama
-- ▶️ Başlat/Durdur kontrolleri
-- 🎨 Basit ve kullanıcı dostu arayüz
-- 💻 Windows EXE formatında çalışır
-- 🔥 F9 tuşu ile hızlı başlat/durdur (Hotkey)
+### 🎯 Ana Özellikler
+- ⌨️ **Tuş Kontrolü**: Herhangi bir tuşu otomatik basma
+- 🎯 **Otomatik Yakalama**: Tuş yakalama butonu ile kolay ayarlama
+- 🔥 **F9 Hotkey**: Hızlı başlat/durdur kısayolu
+- ⏱️ **Zaman Ayarı**: Milisaniye veya saniye cinsinden hassas zamanlama
+- 🎲 **Rastgele Aralık**: Min-Max değer aralığında doğal simülasyon
+- 🔢 **Tekrar Kontrolü**: Sonsuz veya belirli sayıda tekrar
+- ⏸️ **Duraklat/Devam**: Makroyu durdurmadan duraklatma
+
+### 📊 İstatistikler ve Takip
+- 📈 **Gelişmiş İstatistikler**: Geçen süre ve toplam basış sayısı
+- 📊 **Canlı Sayaç**: Anlık basış ve kalan tekrar göstergesi
+- 💾 **Otomatik Kaydetme**: Ayarlar anında kaydedilir
+
+### 🎨 Kullanıcı Deneyimi
+- 🎨 Temiz ve modern arayüz
+- 🇹🇷 Türkçe dil desteği
+- 💻 Windows 10/11 uyumlu
 - 🔒 Çalışırken kapatma koruması
+- 🔗 GitHub entegrasyonu
 
 ## 🚀 Kurulum
 
 ### Seçenek 1: EXE Dosyası (Önerilen)
-1. [Releases](https://github.com/proftvv/Mark-V/releases) sayfasından en son `MarkV.exe` dosyasını indirin
+1. [Releases](https://github.com/proftvv/Mark-V/releases) sayfasından `Mark-V-v1.0.0.exe` dosyasını indirin
 2. İndirilen EXE'yi çalıştırın
 3. Python kurulumuna gerek yok!
 

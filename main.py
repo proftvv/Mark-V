@@ -1,6 +1,6 @@
 """
 Mark-V - Macro Tuş Basma Programı
-Version: 0.0.9-R5
+Version: 1.0.0
 """
 
 import tkinter as tk
@@ -285,7 +285,7 @@ class MacroApp:
         # Versiyon
         version_label = tk.Label(
             footer_frame,
-            text="v0.0.9-R5",
+            text="v1.0.0",
             font=("Arial", 8),
             fg="#95a5a6",
             bg='#ecf0f1'
