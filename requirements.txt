@@ -4,5 +4,9 @@ tkinter-tooltip==2.1.0
 # Keyboard/Mouse Control
 pynput==1.7.6
 
+# System Tray Icon
+pystray==0.19.5
+Pillow==10.1.0
+
 # EXE Builder
 pyinstaller==6.3.0

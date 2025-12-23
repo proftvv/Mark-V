@@ -1,6 +1,78 @@
 # Versiyon Geçmişi
 
+## v0.0.3 (23 Aralık 2025)
+
+### Değişiklikler:
+- ⌨️ **Hotkey desteği eklendi**
+  - F9 tuşu ile başlat/durdur
+  - pynput.keyboard.Listener ile global hotkey dinleme
+  - UI'da hotkey bilgi etiketi
+- 💾 **Ayar kaydetme/yükleme sistemi**
+  - config.json dosyasına otomatik kaydetme
+  - Son kullanılan tuş ve aralık değerlerini hatırlama
+  - UTF-8 encoding desteği
+- 🔒 **Gelişmiş güvenlik**
+  - Çalışırken kapatma uyarısı
+  - WM_DELETE_WINDOW event handling
+  - Listener cleanup on exit
+- 🎨 **UI iyileştirmeleri**
+  - Pencere boyutu güncellendi (350px)
+  - Hotkey kısayol bilgisi göstergesi
+  - Daha temiz arayüz
+- 🧹 **Kod optimizasyonu**
+  - Daemon thread kullanımı
+  - Exception handling iyileştirmeleri
+  - Config dosya yönetimi
+
+### Teknik Detaylar:
+- `pynput.keyboard.Listener` ile F9 tuş dinleme
+- `json.dump/load` ile ayar kaydetme
+- `root.protocol` ile pencere kapatma kontrolü
+- Saved settings: key, interval
+
 ## v0.0.2 (23 Aralık 2025)
+
+### Değişiklikler:
+- ✅ **Tuş basma mekanizması eklendi**
+  - pynput.keyboard kullanılarak tuş kontrol sistemi
+  - Tek karakter ve özel tuşlar (space, enter, tab, vb.) desteği
+  - Threading ile arka planda çalışma
+- ⏱️ **Zamanlayıcı sistem implement edildi**
+  - Milisaniye cinsinden ayarlanabilir aralık
+  - Thread-safe basış sayacı
+  - Her 10 basışta durum güncelleme
+- 🎨 **UI iyileştirmeleri**
+  - Basış sayısı göstergesi
+  - Çalışırken input alanları kilitleme
+  - Hata mesajları (messagebox)
+  - Detaylı durum bilgisi
+- 📄 **MIT Lisansı eklendi**
+  - README'de lisans badge'i
+  - LICENSE dosyası güncellendi
+- 🔧 **Kod iyileştirmeleri**
+  - Try-catch blokları ile hata yönetimi
+  - Input validasyonu
+  - Thread daemon mode
+
+### Teknik Detaylar:
+- `Controller()` ile klavye kontrolü
+- `threading.Thread` ile async tuş basma
+- `time.sleep()` ile milisaniye hassasiyetli bekleme
+
+## v0.0.1 (23 Aralık 2025)
+
+### Değişiklikler:
+- ✨ Proje başlatıldı
+- 📁 Temel klasör yapısı oluşturuldu
+- 📝 Git repository kurulumu
+- 📄 Proje dokümantasyonu hazırlandı
+- 🔧 .gitignore ve temel dosyalar eklendi
+
+### Planlanan Özellikler:
+- Tuş basma mekanizması
+- Zamanlayıcı sistem
+- Tkinter GUI arayüzü
+- EXE dönüşümü
 
 ### Değişiklikler:
 - ✅ **Tuş basma mekanizması eklendi**

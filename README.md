@@ -1,6 +1,6 @@
 # Mark-V - Macro Tuş Basma Programı
 
-![Version](https://img.shields.io/badge/version-0.0.2-blue)
+![Version](https://img.shields.io/badge/version-0.0.3-blue)
 ![Python](https://img.shields.io/badge/python-3.8+-green)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
@@ -15,6 +15,9 @@ Mark-V, belirli bir tuşu ayarlanabilir aralıklarla otomatik olarak basan bir m
 - ▶️ Başlat/Durdur kontrolleri
 - 🎯 Basit ve kullanıcı dostu arayüz
 - 💻 Windows EXE formatında çalışır
+- 🔥 F9 tuşu ile hızlı başlat/durdur (Hotkey)
+- 💾 Ayarları otomatik kaydetme ve yükleme
+- 🔒 Çalışırken kapatma koruması
 
 ## 🚀 Kurulum
 
@@ -42,8 +45,15 @@ pyinstaller --onefile --windowed --name=MarkV main.py
 1. Programı başlatın
 2. Basmak istediğiniz tuşu girin
 3. Basma aralığını milisaniye cinsinden ayarlayın
-4. "Başlat" butonuna tıklayın
-5. Durdurmak için "Durdur" butonuna tıklayın
+4. "Başlat" butonuna tıklayın veya **F9** tuşuna basın
+5. Durdurmak için "Durdur" butonuna tıklayın veya **F9** tuşuna basın
+
+### 🔥 Kısayollar
+- **F9**: Macro'yu başlat/durdur (global hotkey)
+
+### 📋 Desteklenen Tuşlar
+- Tek karakterler: `a`, `b`, `1`, `2`, vb.
+- Özel tuşlar: `space`, `enter`, `tab`, `esc`, `shift`, `ctrl`, `alt`
 
 ## 📋 Versiyon Geçmişi
 

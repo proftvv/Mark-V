@@ -1,26 +1,40 @@
 """
 Mark-V - Macro Tuş Basma Programı
-Version: 0.0.2
+Version: 0.0.3
 """
 
 import tkinter as tk
 from tkinter import ttk, messagebox
 import threading
 import time
-from pynput.keyboard import Key, Controller
+import json
+import os
+from pynput.keyboard import Key, Controller, Listener
+from PIL import Image, ImageDraw
+import pystray
 
 class MacroApp:
     def __init__(self, root):
         self.root = root
         self.root.title("Mark-V - Macro Tuş Basma")
-        self.root.geometry("400x300")
+        self.root.geometry("400x350")
         self.root.resizable(False, False)
         
         self.is_running = False
         self.macro_thread = None
         self.keyboard_controller = Controller()
+        self.hotkey_listener = None
+        self.tray_icon = None
+        
+        # Ayarlar dosyası
+        self.config_file = "config.json"
+        self.load_settings()
         
         self.setup_ui()
+        self.start_hotkey_listener()
+        
+        # Pencere kapatma olayı
+        self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
     
     def setup_ui(self):
         """Kullanıcı arayüzünü oluştur"""
@@ -33,13 +47,22 @@ class MacroApp:
         )
         title_label.pack(pady=20)
         
+        # Hotkey bilgisi
+        hotkey_info = tk.Label(
+            self.root,
+            text="⌨️ Kısayol: F9 (Başlat/Durdur)",
+            font=("Arial", 9),
+            fg="#7f8c8d"
+        )
+        hotkey_info.pack(pady=5)
+        
         # Tuş seçimi
         key_frame = tk.Frame(self.root)
         key_frame.pack(pady=10)
         
         tk.Label(key_frame, text="Tuş:", font=("Arial", 10)).pack(side=tk.LEFT, padx=5)
         self.key_entry = tk.Entry(key_frame, width=10, font=("Arial", 10))
-        self.key_entry.insert(0, "a")
+        self.key_entry.insert(0, self.last_key)
         self.key_entry.pack(side=tk.LEFT, padx=5)
         
         # Süre ayarı
@@ -48,7 +71,7 @@ class MacroApp:
         
         tk.Label(interval_frame, text="Aralık (ms):", font=("Arial", 10)).pack(side=tk.LEFT, padx=5)
         self.interval_entry = tk.Entry(interval_frame, width=10, font=("Arial", 10))
-        self.interval_entry.insert(0, "1000")
+        self.interval_entry.insert(0, self.last_interval)
         self.interval_entry.pack(side=tk.LEFT, padx=5)
         
         # Kontrol butonları
@@ -92,7 +115,7 @@ class MacroApp:
         # Versiyon
         version_label = tk.Label(
             self.root,
-            text="v0.0.2",
+            text="v0.0.3",
             font=("Arial", 8),
             fg="#95a5a6"
         )
@@ -118,6 +141,9 @@ class MacroApp:
             self.macro_thread = threading.Thread(target=self.run_macro, args=(key, interval))
             self.macro_thread.daemon = True
             self.macro_thread.start()
+            
+            # Ayarları kaydet
+            self.save_settings()
             
             # UI güncellemeleri
             self.status_label.config(text=f"Durum: Çalışıyor... ('{key}' her {interval}ms)", fg="#27ae60")
@@ -189,6 +215,70 @@ class MacroApp:
                 ))
                 self.root.after(0, self.stop_macro)
                 break
+    
+    def load_settings(self):
+        """Ayarları yükle"""
+        try:
+            if os.path.exists(self.config_file):
+                with open(self.config_file, 'r', encoding='utf-8') as f:
+                    config = json.load(f)
+                    self.last_key = config.get('key', 'a')
+                    self.last_interval = config.get('interval', '1000')
+            else:
+                self.last_key = 'a'
+                self.last_interval = '1000'
+        except Exception:
+            self.last_key = 'a'
+            self.last_interval = '1000'
+    
+    def save_settings(self):
+        """Ayarları kaydet"""
+        try:
+            config = {
+                'key': self.key_entry.get(),
+                'interval': self.interval_entry.get()
+            }
+            with open(self.config_file, 'w', encoding='utf-8') as f:
+                json.dump(config, f, indent=4)
+        except Exception:
+            pass
+    
+    def start_hotkey_listener(self):
+        """Hotkey listener'ı başlat"""
+        def on_press(key):
+            try:
+                # F9 tuşu kontrolü
+                if key == Key.f9:
+                    self.root.after(0, self.toggle_macro)
+            except Exception:
+                pass
+        
+        self.hotkey_listener = Listener(on_press=on_press)
+        self.hotkey_listener.daemon = True
+        self.hotkey_listener.start()
+    
+    def toggle_macro(self):
+        """Macro'yu başlat/durdur (F9 ile)"""
+        if self.is_running:
+            self.stop_macro()
+        else:
+            self.start_macro()
+    
+    def on_closing(self):
+        """Pencere kapatma olayı"""
+        if self.is_running:
+            result = messagebox.askyesno(
+                "Uyarı",
+                "Macro çalışıyor! Yine de kapatmak istiyor musunuz?"
+            )
+            if not result:
+                return
+        
+        # Listener'ı durdur
+        if self.hotkey_listener:
+            self.hotkey_listener.stop()
+        
+        self.root.destroy()
 
 def main():
     root = tk.Tk()
