@@ -1,5 +1,30 @@
 # Versiyon Geçmişi
 
+## v0.0.9-R3 (23 Aralık 2025)
+
+### Değişiklikler:
+- 🎨 **Dark tema iyileştirmesi**
+  - Daha iyi renk paleti (#1e272e arka plan)
+  - Gelişmiş kontrast oranları
+  - Entry'ler için #2f3640 koyu gri
+  - LabelFrame için #2f3640 (ana arka plandan daha açık)
+  - Metin rengi #f5f6fa (daha okunaklı)
+  - İkincil metin #a4b0be
+  - Parlak mavi butonlar (#0984e3)
+- 🖼️ **Asset güncellemesi**
+  - 49988250.jpg'den tüm asset'ler otomatik oluşturuldu
+  - icon.ico (çoklu boyut desteği)
+  - icon.png (256x256)
+  - background.png (200x200, %15 opaklık watermark)
+  - logo.png (128x128, renkli)
+  - update_assets.py scripti eklendi
+
+### Teknik Detaylar:
+- `label_frame_bg` tema rengi eklendi
+- LabelFrame içindeki label'lar için özel arka plan
+- LANCZOS resampling ile yüksek kaliteli görsel ölçekleme
+- Otomatik asset generation scripti
+
 ## v0.0.9-R2 (23 Aralık 2025)
 
 ### Düzeltmeler:

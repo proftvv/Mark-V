@@ -1,6 +1,6 @@
 """
 Mark-V - Macro Tuş Basma Programı
-Version: 0.0.9-R2
+Version: 0.0.9-R3
 """
 
 import tkinter as tk
@@ -45,20 +45,24 @@ class MacroApp:
         # Tema renkleri
         self.themes = {
             'light': {
-                'bg': '#ecf0f1',
-                'fg': '#2c3e50',
-                'secondary': '#7f8c8d',
-                'entry_bg': 'white',
-                'entry_fg': 'black',
-                'button_bg': '#3498db'
+                'bg': '#ecf0f1',           # Açık gri arka plan
+                'fg': '#2c3e50',           # Koyu metin
+                'secondary': '#7f8c8d',     # İkincil metin
+                'entry_bg': 'white',        # Entry arka plan
+                'entry_fg': 'black',        # Entry metin
+                'button_bg': '#3498db',     # Mavi buton
+                'frame_bg': '#ecf0f1',      # Frame arka plan
+                'label_frame_bg': '#ecf0f1' # LabelFrame arka plan
             },
             'dark': {
-                'bg': '#2c3e50',
-                'fg': '#ecf0f1',
-                'secondary': '#95a5a6',
-                'entry_bg': '#34495e',
-                'entry_fg': '#ecf0f1',
-                'button_bg': '#2980b9'
+                'bg': '#1e272e',           # Koyu gri-mavi arka plan
+                'fg': '#f5f6fa',           # Açık beyaz metin
+                'secondary': '#a4b0be',     # Gri ikincil metin
+                'entry_bg': '#2f3640',      # Koyu gri entry
+                'entry_fg': '#f5f6fa',      # Açık metin
+                'button_bg': '#0984e3',     # Parlak mavi buton
+                'frame_bg': '#1e272e',      # Frame arka plan
+                'label_frame_bg': '#2f3640' # LabelFrame arka plan (daha açık)
             }
         }
         self.current_theme = 'light'
@@ -339,7 +343,7 @@ class MacroApp:
         # Versiyon
         version_label = tk.Label(
             footer_frame,
-            text="v0.0.9-R2",
+            text="v0.0.9-R3",
             font=("Arial", 8),
             fg="#95a5a6",
             bg='#ecf0f1'
@@ -755,8 +759,8 @@ class MacroApp:
         
         # İstatistikler
         try:
-            self.elapsed_time_label.config(bg=theme['bg'], fg=theme['fg'])
-            self.total_presses_label.config(bg=theme['bg'], fg=theme['fg'])
+            self.elapsed_time_label.config(bg=theme['label_frame_bg'], fg=theme['fg'])
+            self.total_presses_label.config(bg=theme['label_frame_bg'], fg=theme['fg'])
         except:
             pass
         
@@ -778,12 +782,14 @@ class MacroApp:
             elif widget_type == 'Frame':
                 widget.config(bg=theme['bg'])
             elif widget_type == 'LabelFrame':
-                widget.config(bg=theme['bg'], fg=theme['fg'])
+                # LabelFrame için özel arka plan rengi
+                widget.config(bg=theme['label_frame_bg'], fg=theme['fg'])
             
             # Alt widget'ları da güncelle
             for child in widget.winfo_children():
                 self.update_widget_theme_recursive(child, theme)
         except:
+            pass
             pass
     
     def open_github(self):
