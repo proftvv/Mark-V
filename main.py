@@ -1,6 +1,6 @@
 """
 Mark-V - Macro Tuş Basma Programı
-Version: 0.0.8
+Version: 0.0.9
 """
 
 import tkinter as tk
@@ -10,6 +10,7 @@ import time
 import json
 import os
 import random
+from datetime import datetime, timedelta
 from pynput.keyboard import Key, Controller, Listener
 from PIL import Image, ImageDraw, ImageTk
 import pystray
@@ -38,6 +39,23 @@ class MacroApp:
         self.key_capture_listener = None
         self.press_count = 0
         self.remaining_count = 0
+        self.start_time = None
+        self.total_session_presses = 0
+        
+        # Tema renkleri
+        self.themes = {
+            'light': {
+                'bg': '#ecf0f1',
+                'fg': '#2c3e50',
+                'secondary': '#7f8c8d'
+            },
+            'dark': {
+                'bg': '#2c3e50',
+                'fg': '#ecf0f1',
+                'secondary': '#95a5a6'
+            }
+        }
+        self.current_theme = 'light'
         
         # Ayarlar dosyası
         self.config_file = "config.json"
@@ -45,9 +63,16 @@ class MacroApp:
         
         self.setup_ui()
         self.start_hotkey_listener()
+        self.setup_tray()
+        
+        # Temayı uygula
+        if self.current_theme == 'dark':
+            self.root.after(100, self.toggle_theme)
         
         # Pencere kapatma olayı
         self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
+        # Minimize olayı
+        self.root.bind('<Unmap>', self.on_minimize)
     
     def setup_ui(self):
         """Kullanıcı arayüzünü oluştur"""
@@ -234,10 +259,51 @@ class MacroApp:
         )
         self.status_label.pack(pady=10)
         
+        # İstatistik paneli
+        stats_frame = tk.LabelFrame(
+            self.root,
+            text="📈 İstatistikler",
+            font=("Arial", 9, "bold"),
+            bg='#ecf0f1',
+            fg='#2c3e50'
+        )
+        stats_frame.pack(pady=10, padx=20, fill=tk.X)
+        
+        self.elapsed_time_label = tk.Label(
+            stats_frame,
+            text="⏱️ Geçen Süre: 00:00:00",
+            font=("Arial", 9),
+            bg='#ecf0f1',
+            fg='#2c3e50'
+        )
+        self.elapsed_time_label.pack(pady=2)
+        
+        self.total_presses_label = tk.Label(
+            stats_frame,
+            text="🎯 Toplam Basış (Oturum): 0",
+            font=("Arial", 9),
+            bg='#ecf0f1',
+            fg='#2c3e50'
+        )
+        self.total_presses_label.pack(pady=2)
+        
+        # Tema toggle butonu
+        theme_btn = tk.Button(
+            self.root,
+            text="🌓 Tema Değiştir",
+            command=self.toggle_theme,
+            font=("Arial", 9),
+            bg="#9b59b6",
+            fg="white",
+            cursor="hand2",
+            width=15
+        )
+        theme_btn.pack(pady=5)
+        
         # Versiyon
         version_label = tk.Label(
             self.root,
-            text="v0.0.8",
+            text="v0.0.9",
             font=("Arial", 8),
             fg="#95a5a6",
             bg='#ecf0f1'
@@ -254,6 +320,7 @@ class MacroApp:
             self.min_interval_entry.config(state=tk.DISABLED)
             self.max_interval_entry.config(state=tk.DISABLED)
             self.interval_entry.config(state=tk.NORMAL)
+        self.save_settings()  # Otomatik kaydet
     
     def toggle_infinite(self):
         """Sonsuz mod toggle"""
@@ -261,6 +328,7 @@ class MacroApp:
             self.repeat_entry.config(state=tk.DISABLED)
         else:
             self.repeat_entry.config(state=tk.NORMAL)
+        self.save_settings()  # Otomatik kaydet
     
     def start_macro(self):
         """Macro'yu başlat"""
@@ -311,9 +379,13 @@ class MacroApp:
             self.is_running = True
             self.is_paused = False
             self.press_count = 0
+            self.start_time = datetime.now()
             self.macro_thread = threading.Thread(target=self.run_macro, args=(key,))
             self.macro_thread.daemon = True
             self.macro_thread.start()
+            
+            # Süre güncelleyici başlat
+            self.update_elapsed_time()
             
             # Ayarları kaydet
             self.save_settings()
@@ -350,6 +422,7 @@ class MacroApp:
         """Macro'yu durdur"""
         self.is_running = False
         self.is_paused = False
+        self.start_time = None
         
         # UI güncellemeleri
         self.status_label.config(text="Durum: Durduruldu", fg="#e74c3c")
@@ -420,6 +493,7 @@ class MacroApp:
                         self.keyboard_controller.release(key)
                 
                 self.press_count += 1
+                self.total_session_presses += 1
                 
                 # Kalan sayıyı azalt (sonsuz değilse)
                 if self.remaining_count > 0:
@@ -429,6 +503,9 @@ class MacroApp:
                 remaining_text = "∞" if self.remaining_count == -1 else str(self.remaining_count)
                 self.root.after(0, lambda: self.counter_label.config(
                     text=f"📊 Basış: {self.press_count} | Kalan: {remaining_text}"
+                ))
+                self.root.after(0, lambda: self.total_presses_label.config(
+                    text=f"🎯 Toplam Basış (Oturum): {self.total_session_presses}"
                 ))
                 
                 # Aralık hesaplama (rastgele veya sabit)
@@ -473,6 +550,7 @@ class MacroApp:
                     self.last_max_interval = config.get('max_interval', '1500')
                     self.last_infinite = config.get('infinite', True)
                     self.last_repeat = config.get('repeat', '100')
+                    self.current_theme = config.get('theme', 'light')
             else:
                 self.last_key = 'a'
                 self.last_interval = '1000'
@@ -503,7 +581,8 @@ class MacroApp:
                 'min_interval': self.min_interval_entry.get(),
                 'max_interval': self.max_interval_entry.get(),
                 'infinite': self.infinite_var.get(),
-                'repeat': self.repeat_entry.get()
+                'repeat': self.repeat_entry.get(),
+                'theme': self.current_theme
             }
             with open(self.config_file, 'w', encoding='utf-8') as f:
                 json.dump(config, f, indent=4)
@@ -540,6 +619,10 @@ class MacroApp:
             )
             if not result:
                 return
+        
+        # Tray'i kapat
+        if self.tray_icon:
+            self.tray_icon.stop()
         
         # Listener'ı durdur
         if self.hotkey_listener:
@@ -596,6 +679,102 @@ class MacroApp:
                 return str(key).replace("'", "")
         except:
             return str(key).replace("'", "")
+    
+    def toggle_theme(self):
+        """Tema değiştir (açık/koyu)"""
+        # Tema değiştir
+        self.current_theme = 'dark' if self.current_theme == 'light' else 'light'
+        theme = self.themes[self.current_theme]
+        
+        # Tüm widget'ları güncelle
+        self.root.config(bg=theme['bg'])
+        
+        for widget in self.root.winfo_children():
+            self.update_widget_theme(widget, theme)
+        
+        self.save_settings()
+    
+    def update_widget_theme(self, widget, theme):
+        """Widget temasını güncelle"""
+        try:
+            widget_type = widget.winfo_class()
+            
+            if widget_type in ['Label', 'Frame', 'Checkbutton']:
+                widget.config(bg=theme['bg'], fg=theme['fg'])
+            elif widget_type == 'LabelFrame':
+                widget.config(bg=theme['bg'], fg=theme['fg'])
+            
+            # Alt widget'ları da güncelle
+            for child in widget.winfo_children():
+                self.update_widget_theme(child, theme)
+        except:
+            pass
+    
+    def setup_tray(self):
+        """Sistem tepsisi ikonu oluştur"""
+        try:
+            # İkon oluştur
+            icon_image = Image.open('icon.ico')
+            
+            # Tray menüsü
+            menu = pystray.Menu(
+                pystray.MenuItem("Göster", self.show_window),
+                pystray.MenuItem("Gizle", self.hide_window),
+                pystray.MenuItem("Çıkış", self.quit_app)
+            )
+            
+            # Tray ikonu
+            self.tray_icon = pystray.Icon("Mark-V", icon_image, "Mark-V Macro", menu)
+            
+            # Tray'i arka planda çalıştır
+            threading.Thread(target=self.tray_icon.run, daemon=True).start()
+        except Exception as e:
+            print(f"Tray ikon hatası: {e}")
+    
+    def show_window(self, icon=None, item=None):
+        """Pencereyi göster"""
+        self.root.deiconify()
+        self.root.lift()
+        self.root.focus_force()
+    
+    def hide_window(self, icon=None, item=None):
+        """Pencereyi gizle"""
+        self.root.withdraw()
+    
+    def on_minimize(self, event):
+        """Minimize olayında tray'e gönder"""
+        if str(event.widget) == '.':
+            # Ana pencere minimize edildiğinde gizle
+            self.root.after(100, self.hide_window)
+    
+    def quit_app(self, icon=None, item=None):
+        """Uygulamayı kapat"""
+        if self.tray_icon:
+            self.tray_icon.stop()
+        
+        if self.hotkey_listener:
+            self.hotkey_listener.stop()
+        
+        if self.key_capture_listener:
+            self.key_capture_listener.stop()
+        
+        self.root.quit()
+    
+    def update_elapsed_time(self):
+        """Geçen süreyi güncelle"""
+        if self.is_running and self.start_time:
+            elapsed = datetime.now() - self.start_time
+            # Formatla: HH:MM:SS
+            hours, remainder = divmod(int(elapsed.total_seconds()), 3600)
+            minutes, seconds = divmod(remainder, 60)
+            time_str = f"{hours:02d}:{minutes:02d}:{seconds:02d}"
+            
+            self.elapsed_time_label.config(text=f"⏱️ Geçen Süre: {time_str}")
+            
+            # 1 saniye sonra tekrar güncelle
+            self.root.after(1000, self.update_elapsed_time)
+        else:
+            self.elapsed_time_label.config(text="⏱️ Geçen Süre: 00:00:00")
 
 def main():
     root = tk.Tk()

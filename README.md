@@ -1,6 +1,6 @@
 # Mark-V - Macro Tuş Basma Programı
 
-![Version](https://img.shields.io/badge/version-0.0.8-blue)
+![Version](https://img.shields.io/badge/version-0.0.9-blue)
 ![Python](https://img.shields.io/badge/python-3.8+-green)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
@@ -10,6 +10,10 @@ Mark-V, belirli bir tuşu ayarlanabilir aralıklarla otomatik olarak basan bir m
 
 ## ✨ Özellikler
 
+- 🖥️ **Sistem tepsisi desteği** (minimize edildiğinde tray'de çalışır)
+- 🌓 **Açık/Koyu tema** (tek tuşla tema değiştirme)
+- 📈 **Gelişmiş istatistikler** (geçen süre, toplam basış)
+- 💾 **Otomatik kaydetme** (ayarlar anında kaydedilir)
 - 🔢 Tekrar sayısı ayarlama (sonsuz veya sınırlı)
 - 🎲 Rastgele aralık (Min-Max değer aralığı)
 - 📊 Canlı sayaç (basış & kalan)
@@ -19,10 +23,9 @@ Mark-V, belirli bir tuşu ayarlanabilir aralıklarla otomatik olarak basan bir m
 - ⌨️ İstediğiniz tuşu seçebilme
 - ⏰ Basma aralığını milisaniye veya saniye cinsinden ayarlama
 - ▶️ Başlat/Durdur kontrolleri
-- 🎯 Basit ve kullanıcı dostu arayüz
+- 🎨 Basit ve kullanıcı dostu arayüz
 - 💻 Windows EXE formatında çalışır
 - 🔥 F9 tuşu ile hızlı başlat/durdur (Hotkey)
-- 💾 Ayarları otomatik kaydetme ve yükleme
 - 🔒 Çalışırken kapatma koruması
 
 ## 🚀 Kurulum

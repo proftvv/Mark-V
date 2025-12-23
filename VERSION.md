@@ -1,5 +1,38 @@
 # Versiyon Geçmişi
 
+## v0.0.9 (23 Aralık 2025)
+
+### Değişiklikler:
+- 🖥️ **Sistem tepsisi (System Tray) desteği**
+  - Minimize edildiğinde tray'e gönderme
+  - Tray menüsü: Göster, Gizle, Çıkış
+  - pystray kütüphanesi ile entegrasyon
+  - Arka planda çalışma desteği
+- 🌓 **Açık/Koyu tema seçici**
+  - Light ve Dark tema desteği
+  - Tek tuşla tema değiştirme
+  - Tüm UI elementlerini otomatik güncelleme
+  - Tema tercihi config'e kaydediliyor
+- 💾 **Otomatik kaydetme**
+  - Checkbox değişikliklerinde otomatik kayıt
+  - Entry değişikliklerinde otomatik kayıt
+  - Kullanıcı deneyimi iyileştirmesi
+- 📈 **Gelişmiş istatistikler**
+  - ⏱️ Geçen süre göstergesi (HH:MM:SS)
+  - 🎯 Toplam basış sayısı (oturum boyunca)
+  - Gerçek zamanlı güncelleme
+  - İstatistik paneli eklendi
+
+### Teknik Detaylar:
+- `pystray` ile sistem tepsisi ikonu
+- `datetime` ve `timedelta` ile süre takibi
+- `total_session_presses` değişkeni ile toplam sayaç
+- Tema sistemi: light/dark renk paletleri
+- `update_widget_theme()` ile recursive widget güncelleme
+- `update_elapsed_time()` ile 1 saniyelik süre güncelleyici
+- Config dosyasına `theme` alanı eklendi
+- `on_minimize` event handler ile tray entegrasyonu
+
 ## v0.0.8 (23 Aralık 2025)
 
 ### Değişiklikler:
