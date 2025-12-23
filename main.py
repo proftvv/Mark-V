@@ -1,6 +1,6 @@
 """
 Mark-V - Macro Tuş Basma Programı
-Version: 0.0.4
+Version: 0.0.5
 """
 
 import tkinter as tk
@@ -16,7 +16,7 @@ import pystray
 class MacroApp:
     def __init__(self, root):
         self.root = root
-        self.root.title("Mark-V Private For ZORBEY <3")
+        self.root.title("Mark-V | Private For ZORBEY <3")
         self.root.geometry("400x350")
         self.root.resizable(False, False)
         
@@ -121,7 +121,7 @@ class MacroApp:
         # Versiyon
         version_label = tk.Label(
             self.root,
-            text="v0.0.4",
+            text="v0.0.5",
             font=("Arial", 8),
             fg="#95a5a6"
         )

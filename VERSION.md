@@ -1,5 +1,17 @@
 # Versiyon Geçmişi
 
+## v0.0.5 (23 Aralık 2025)
+
+### Değişiklikler:
+- 🏷️ **Başlık formatı güncellendi**
+  - "Mark-V | Private For ZORBEY <3" formatına geçildi
+  - Pipe (|) karakteri ile daha temiz görünüm
+  - Hem pencere başlığı hem taskbar'da yeni format
+
+### Teknik Detaylar:
+- root.title() güncellendi
+- EXE yeniden build edildi
+
 ## v0.0.4 (23 Aralık 2025)
 
 ### Değişiklikler:
