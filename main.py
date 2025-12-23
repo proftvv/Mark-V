@@ -1,6 +1,6 @@
 """
 Mark-V - Macro Tuş Basma Programı
-Version: 0.0.6
+Version: 0.0.7
 """
 
 import tkinter as tk
@@ -10,7 +10,7 @@ import time
 import json
 import os
 from pynput.keyboard import Key, Controller, Listener
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageTk
 import pystray
 
 class MacroApp:
@@ -19,6 +19,7 @@ class MacroApp:
         self.root.title("Mark-V | Private For ZORBEY <3")
         self.root.geometry("400x350")
         self.root.resizable(False, False)
+        self.root.configure(bg='#ecf0f1')  # Açık gri arka plan
         
         # Icon ayarla (eğer varsa)
         try:
@@ -46,12 +47,23 @@ class MacroApp:
     
     def setup_ui(self):
         """Kullanıcı arayüzünü oluştur"""
+        # Arka plan resmi (siluet/watermark)
+        try:
+            bg_image = Image.open('background.png')
+            bg_photo = ImageTk.PhotoImage(bg_image)
+            bg_label = tk.Label(self.root, image=bg_photo)
+            bg_label.image = bg_photo  # Referansı sakla
+            bg_label.place(relx=0.5, rely=0.5, anchor='center')
+        except:
+            pass  # Resim yoksa devam et
+        
         # Başlık
         title_label = tk.Label(
             self.root, 
             text="Mark-V Macro", 
             font=("Arial", 18, "bold"),
-            fg="#2c3e50"
+            fg="#2c3e50",
+            bg='#ecf0f1'
         )
         title_label.pack(pady=20)
         
@@ -60,15 +72,16 @@ class MacroApp:
             self.root,
             text="⌨️ Kısayol: F9 (Başlat/Durdur)",
             font=("Arial", 9),
-            fg="#7f8c8d"
+            fg="#7f8c8d",
+            bg='#ecf0f1'
         )
         hotkey_info.pack(pady=5)
         
         # Tuş seçimi
-        key_frame = tk.Frame(self.root)
+        key_frame = tk.Frame(self.root, bg='#ecf0f1')
         key_frame.pack(pady=10)
         
-        tk.Label(key_frame, text="Tuş:", font=("Arial", 10)).pack(side=tk.LEFT, padx=5)
+        tk.Label(key_frame, text="Tuş:", font=("Arial", 10), bg='#ecf0f1').pack(side=tk.LEFT, padx=5)
         self.key_entry = tk.Entry(key_frame, width=15, font=("Arial", 10))
         self.key_entry.insert(0, self.last_key)
         self.key_entry.pack(side=tk.LEFT, padx=5)
@@ -87,10 +100,10 @@ class MacroApp:
         capture_btn.pack(side=tk.LEFT, padx=5)
         
         # Süre ayarı
-        interval_frame = tk.Frame(self.root)
+        interval_frame = tk.Frame(self.root, bg='#ecf0f1')
         interval_frame.pack(pady=10)
         
-        tk.Label(interval_frame, text="Aralık:", font=("Arial", 10)).pack(side=tk.LEFT, padx=5)
+        tk.Label(interval_frame, text="Aralık:", font=("Arial", 10), bg='#ecf0f1').pack(side=tk.LEFT, padx=5)
         self.interval_entry = tk.Entry(interval_frame, width=8, font=("Arial", 10))
         self.interval_entry.insert(0, self.last_interval)
         self.interval_entry.pack(side=tk.LEFT, padx=5)
@@ -108,7 +121,7 @@ class MacroApp:
         self.time_unit_combo.pack(side=tk.LEFT, padx=5)
         
         # Kontrol butonları
-        button_frame = tk.Frame(self.root)
+        button_frame = tk.Frame(self.root, bg='#ecf0f1')
         button_frame.pack(pady=20)
         
         self.start_button = tk.Button(
@@ -141,16 +154,18 @@ class MacroApp:
             self.root,
             text="Durum: Hazır",
             font=("Arial", 10),
-            fg="#7f8c8d"
+            fg="#7f8c8d",
+            bg='#ecf0f1'
         )
         self.status_label.pack(pady=10)
         
         # Versiyon
         version_label = tk.Label(
             self.root,
-            text="v0.0.6",
+            text="v0.0.7",
             font=("Arial", 8),
-            fg="#95a5a6"
+            fg="#95a5a6",
+            bg='#ecf0f1'
         )
         version_label.pack(side=tk.BOTTOM, pady=5)
     

@@ -45,4 +45,5 @@ Thumbs.db
 config.json
 settings.ini
 create_icon.py
+create_background.py
 icon.png

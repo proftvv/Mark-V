@@ -1,5 +1,27 @@
 # Versiyon Geçmişi
 
+## v0.0.7 (23 Aralık 2025)
+
+### Değişiklikler:
+- 🎨 **Arka plan siluet görseli eklendi**
+  - Profil resmi siluet/watermark olarak arka planda
+  - PIL ile görsel işleme (gri tonlama, şeffaflık)
+  - %15 opaklık ile ince watermark efekti
+  - 200x200 boyutunda merkeze yerleştirildi
+- 🎨 **UI renk şeması güncellendi**
+  - Açık gri (#ecf0f1) arka plan
+  - Tüm elementlerin arka plan renkleri uyumlu hale getirildi
+  - Daha modern ve temiz görünüm
+- 📦 **EXE paketleme iyileştirildi**
+  - background.png dosyası EXE'ye gömüldü
+  - --add-data parametresi ile otomatik ekleme
+
+### Teknik Detaylar:
+- `ImageTk.PhotoImage` ile Tkinter'da resim gösterme
+- `place()` geometri yöneticisi ile merkeze yerleştirme
+- `ImageEnhance.Brightness` ile şeffaflık ayarlaması
+- PyInstaller --add-data ile runtime data ekleme
+
 ## v0.0.6 (23 Aralık 2025)
 
 ### Değişiklikler:
