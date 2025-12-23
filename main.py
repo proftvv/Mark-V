@@ -1,6 +1,6 @@
 """
 Mark-V - Macro Tuş Basma Programı
-Version: 0.0.7
+Version: 0.0.8
 """
 
 import tkinter as tk
@@ -9,6 +9,7 @@ import threading
 import time
 import json
 import os
+import random
 from pynput.keyboard import Key, Controller, Listener
 from PIL import Image, ImageDraw, ImageTk
 import pystray
@@ -17,7 +18,7 @@ class MacroApp:
     def __init__(self, root):
         self.root = root
         self.root.title("Mark-V | Private For ZORBEY <3")
-        self.root.geometry("400x350")
+        self.root.geometry("450x500")
         self.root.resizable(False, False)
         self.root.configure(bg='#ecf0f1')  # Açık gri arka plan
         
@@ -28,12 +29,15 @@ class MacroApp:
             pass
         
         self.is_running = False
+        self.is_paused = False
         self.macro_thread = None
         self.keyboard_controller = Controller()
         self.hotkey_listener = None
         self.tray_icon = None
         self.key_capture_mode = False
         self.key_capture_listener = None
+        self.press_count = 0
+        self.remaining_count = 0
         
         # Ayarlar dosyası
         self.config_file = "config.json"
@@ -120,9 +124,54 @@ class MacroApp:
         )
         self.time_unit_combo.pack(side=tk.LEFT, padx=5)
         
+        # Rastgele aralık frame
+        random_frame = tk.Frame(self.root, bg='#ecf0f1')
+        random_frame.pack(pady=5)
+        
+        self.random_var = tk.BooleanVar(value=getattr(self, 'last_random', False))
+        random_check = tk.Checkbutton(
+            random_frame,
+            text="🎲 Rastgele Aralık:",
+            variable=self.random_var,
+            font=("Arial", 9),
+            bg='#ecf0f1',
+            command=self.toggle_random
+        )
+        random_check.pack(side=tk.LEFT, padx=5)
+        
+        tk.Label(random_frame, text="Min:", font=("Arial", 9), bg='#ecf0f1').pack(side=tk.LEFT, padx=2)
+        self.min_interval_entry = tk.Entry(random_frame, width=6, font=("Arial", 9), state=tk.DISABLED)
+        self.min_interval_entry.insert(0, getattr(self, 'last_min_interval', '500'))
+        self.min_interval_entry.pack(side=tk.LEFT, padx=2)
+        
+        tk.Label(random_frame, text="Max:", font=("Arial", 9), bg='#ecf0f1').pack(side=tk.LEFT, padx=2)
+        self.max_interval_entry = tk.Entry(random_frame, width=6, font=("Arial", 9), state=tk.DISABLED)
+        self.max_interval_entry.insert(0, getattr(self, 'last_max_interval', '1500'))
+        self.max_interval_entry.pack(side=tk.LEFT, padx=2)
+        
+        # Tekrar sayısı frame
+        repeat_frame = tk.Frame(self.root, bg='#ecf0f1')
+        repeat_frame.pack(pady=5)
+        
+        self.infinite_var = tk.BooleanVar(value=getattr(self, 'last_infinite', True))
+        infinite_check = tk.Checkbutton(
+            repeat_frame,
+            text="♾️ Sonsuz",
+            variable=self.infinite_var,
+            font=("Arial", 9),
+            bg='#ecf0f1',
+            command=self.toggle_infinite
+        )
+        infinite_check.pack(side=tk.LEFT, padx=5)
+        
+        tk.Label(repeat_frame, text="Tekrar Sayısı:", font=("Arial", 9), bg='#ecf0f1').pack(side=tk.LEFT, padx=5)
+        self.repeat_entry = tk.Entry(repeat_frame, width=8, font=("Arial", 9), state=tk.DISABLED)
+        self.repeat_entry.insert(0, getattr(self, 'last_repeat', '100'))
+        self.repeat_entry.pack(side=tk.LEFT, padx=5)
+        
         # Kontrol butonları
         button_frame = tk.Frame(self.root, bg='#ecf0f1')
-        button_frame.pack(pady=20)
+        button_frame.pack(pady=15)
         
         self.start_button = tk.Button(
             button_frame,
@@ -130,11 +179,24 @@ class MacroApp:
             command=self.start_macro,
             bg="#27ae60",
             fg="white",
-            font=("Arial", 12, "bold"),
-            width=10,
+            font=("Arial", 11, "bold"),
+            width=9,
             cursor="hand2"
         )
-        self.start_button.pack(side=tk.LEFT, padx=10)
+        self.start_button.pack(side=tk.LEFT, padx=5)
+        
+        self.pause_button = tk.Button(
+            button_frame,
+            text="⏸ Duraklat",
+            command=self.pause_macro,
+            bg="#f39c12",
+            fg="white",
+            font=("Arial", 11, "bold"),
+            width=9,
+            cursor="hand2",
+            state=tk.DISABLED
+        )
+        self.pause_button.pack(side=tk.LEFT, padx=5)
         
         self.stop_button = tk.Button(
             button_frame,
@@ -142,12 +204,25 @@ class MacroApp:
             command=self.stop_macro,
             bg="#e74c3c",
             fg="white",
-            font=("Arial", 12, "bold"),
-            width=10,
+            font=("Arial", 11, "bold"),
+            width=9,
             cursor="hand2",
             state=tk.DISABLED
         )
-        self.stop_button.pack(side=tk.LEFT, padx=10)
+        self.stop_button.pack(side=tk.LEFT, padx=5)
+        
+        # Sayaç göstergesi
+        counter_frame = tk.Frame(self.root, bg='#ecf0f1')
+        counter_frame.pack(pady=5)
+        
+        self.counter_label = tk.Label(
+            counter_frame,
+            text="📊 Basış: 0 | Kalan: ∞",
+            font=("Arial", 10, "bold"),
+            fg="#2c3e50",
+            bg='#ecf0f1'
+        )
+        self.counter_label.pack()
         
         # Durum göstergesi
         self.status_label = tk.Label(
@@ -162,38 +237,81 @@ class MacroApp:
         # Versiyon
         version_label = tk.Label(
             self.root,
-            text="v0.0.7",
+            text="v0.0.8",
             font=("Arial", 8),
             fg="#95a5a6",
             bg='#ecf0f1'
         )
         version_label.pack(side=tk.BOTTOM, pady=5)
     
+    def toggle_random(self):
+        """Rastgele aralık toggle"""
+        if self.random_var.get():
+            self.min_interval_entry.config(state=tk.NORMAL)
+            self.max_interval_entry.config(state=tk.NORMAL)
+            self.interval_entry.config(state=tk.DISABLED)
+        else:
+            self.min_interval_entry.config(state=tk.DISABLED)
+            self.max_interval_entry.config(state=tk.DISABLED)
+            self.interval_entry.config(state=tk.NORMAL)
+    
+    def toggle_infinite(self):
+        """Sonsuz mod toggle"""
+        if self.infinite_var.get():
+            self.repeat_entry.config(state=tk.DISABLED)
+        else:
+            self.repeat_entry.config(state=tk.NORMAL)
+    
     def start_macro(self):
         """Macro'yu başlat"""
         try:
             # Tuş ve süre bilgilerini al
             key = self.key_entry.get().strip()
-            interval_value = int(self.interval_entry.get())
-            time_unit = self.time_unit.get()
             
             if not key:
                 messagebox.showerror("Hata", "Lütfen bir tuş girin!")
                 return
             
-            if interval_value <= 0:
-                messagebox.showerror("Hata", "Aralık 0'dan büyük olmalıdır!")
-                return
-            
-            # Zaman birimini milisaniyeye çevir
-            if time_unit == "saniye":
-                interval_ms = interval_value * 1000
+            # Rastgele aralık kontrolü
+            if self.random_var.get():
+                try:
+                    min_val = int(self.min_interval_entry.get())
+                    max_val = int(self.max_interval_entry.get())
+                    if min_val <= 0 or max_val <= 0 or min_val > max_val:
+                        messagebox.showerror("Hata", "Min değer Max'tan küçük ve her ikisi de 0'dan büyük olmalı!")
+                        return
+                except ValueError:
+                    messagebox.showerror("Hata", "Min ve Max değerleri sayısal olmalıdır!")
+                    return
             else:
-                interval_ms = interval_value
+                try:
+                    interval_value = int(self.interval_entry.get())
+                    if interval_value <= 0:
+                        messagebox.showerror("Hata", "Aralık 0'dan büyük olmalıdır!")
+                        return
+                except ValueError:
+                    messagebox.showerror("Hata", "Aralık sayısal bir değer olmalıdır!")
+                    return
+            
+            # Tekrar sayısı kontrolü
+            if not self.infinite_var.get():
+                try:
+                    repeat_count = int(self.repeat_entry.get())
+                    if repeat_count <= 0:
+                        messagebox.showerror("Hata", "Tekrar sayısı 0'dan büyük olmalıdır!")
+                        return
+                    self.remaining_count = repeat_count
+                except ValueError:
+                    messagebox.showerror("Hata", "Tekrar sayısı sayısal bir değer olmalıdır!")
+                    return
+            else:
+                self.remaining_count = -1  # Sonsuz
             
             # Macro'yu başlat
             self.is_running = True
-            self.macro_thread = threading.Thread(target=self.run_macro, args=(key, interval_ms))
+            self.is_paused = False
+            self.press_count = 0
+            self.macro_thread = threading.Thread(target=self.run_macro, args=(key,))
             self.macro_thread.daemon = True
             self.macro_thread.start()
             
@@ -201,33 +319,80 @@ class MacroApp:
             self.save_settings()
             
             # UI güncellemeleri
-            self.status_label.config(text=f"Durum: Çalışıyor... ('{key}' her {interval_value}{time_unit})", fg="#27ae60")
+            self.status_label.config(text=f"Durum: Çalışıyor... ('{key}')", fg="#27ae60")
             self.start_button.config(state=tk.DISABLED)
+            self.pause_button.config(state=tk.NORMAL)
             self.stop_button.config(state=tk.NORMAL)
             self.key_entry.config(state=tk.DISABLED)
             self.interval_entry.config(state=tk.DISABLED)
+            self.min_interval_entry.config(state=tk.DISABLED)
+            self.max_interval_entry.config(state=tk.DISABLED)
+            self.repeat_entry.config(state=tk.DISABLED)
             self.time_unit_combo.config(state=tk.DISABLED)
             
         except ValueError:
             messagebox.showerror("Hata", "Aralık sayısal bir değer olmalıdır!")
     
+    def pause_macro(self):
+        """Macro'yu duraklat/devam ettir"""
+        if self.is_paused:
+            # Devam ettir
+            self.is_paused = False
+            self.pause_button.config(text="⏸ Duraklat", bg="#f39c12")
+            self.status_label.config(text="Durum: Çalışıyor...", fg="#27ae60")
+        else:
+            # Duraklat
+            self.is_paused = True
+            self.pause_button.config(text="▶ Devam", bg="#3498db")
+            self.status_label.config(text="Durum: Duraklatıldı", fg="#f39c12")
+    
     def stop_macro(self):
         """Macro'yu durdur"""
         self.is_running = False
+        self.is_paused = False
         
         # UI güncellemeleri
         self.status_label.config(text="Durum: Durduruldu", fg="#e74c3c")
+        self.counter_label.config(text="📊 Basış: 0 | Kalan: ∞")
         self.start_button.config(state=tk.NORMAL)
+        self.pause_button.config(state=tk.DISABLED, text="⏸ Duraklat", bg="#f39c12")
         self.stop_button.config(state=tk.DISABLED)
         self.key_entry.config(state=tk.NORMAL)
-        self.interval_entry.config(state=tk.NORMAL)
+        
+        # Rastgele aralık durumuna göre
+        if self.random_var.get():
+            self.min_interval_entry.config(state=tk.NORMAL)
+            self.max_interval_entry.config(state=tk.NORMAL)
+            self.interval_entry.config(state=tk.DISABLED)
+        else:
+            self.interval_entry.config(state=tk.NORMAL)
+            self.min_interval_entry.config(state=tk.DISABLED)
+            self.max_interval_entry.config(state=tk.DISABLED)
+        
+        # Tekrar sayısı durumuna göre
+        if not self.infinite_var.get():
+            self.repeat_entry.config(state=tk.NORMAL)
+        
         self.time_unit_combo.config(state="readonly")
     
-    def run_macro(self, key, interval):
+    def run_macro(self, key):
         """Macro döngüsü - ayrı thread'de çalışır"""
-        press_count = 0
         
         while self.is_running:
+            # Duraklat kontrolü
+            while self.is_paused and self.is_running:
+                time.sleep(0.1)
+                continue
+            
+            if not self.is_running:
+                break
+            
+            # Tekrar sayısı kontrolü
+            if self.remaining_count == 0:
+                self.root.after(0, self.stop_macro)
+                self.root.after(0, lambda: messagebox.showinfo("Tamamlandı", "Belirlenen tekrar sayısına ulaşıldı!"))
+                break
+            
             try:
                 # Tuşu bas
                 if len(key) == 1:
@@ -254,16 +419,37 @@ class MacroApp:
                         self.keyboard_controller.press(key)
                         self.keyboard_controller.release(key)
                 
-                press_count += 1
+                self.press_count += 1
                 
-                # Durum güncelleme (her 10 basışta bir)
-                if press_count % 10 == 0:
-                    self.root.after(0, lambda: self.status_label.config(
-                        text=f"Durum: Çalışıyor... ({press_count} basış)"
-                    ))
+                # Kalan sayıyı azalt (sonsuz değilse)
+                if self.remaining_count > 0:
+                    self.remaining_count -= 1
+                
+                # Sayaç güncelleme
+                remaining_text = "∞" if self.remaining_count == -1 else str(self.remaining_count)
+                self.root.after(0, lambda: self.counter_label.config(
+                    text=f"📊 Basış: {self.press_count} | Kalan: {remaining_text}"
+                ))
+                
+                # Aralık hesaplama (rastgele veya sabit)
+                if self.random_var.get():
+                    min_val = int(self.min_interval_entry.get())
+                    max_val = int(self.max_interval_entry.get())
+                    time_unit = self.time_unit.get()
+                    
+                    interval_ms = random.randint(min_val, max_val)
+                    if time_unit == "saniye":
+                        interval_ms *= 1000
+                else:
+                    interval_value = int(self.interval_entry.get())
+                    time_unit = self.time_unit.get()
+                    
+                    interval_ms = interval_value
+                    if time_unit == "saniye":
+                        interval_ms *= 1000
                 
                 # Bekleme süresi (milisaniye cinsinden)
-                time.sleep(interval / 1000.0)
+                time.sleep(interval_ms / 1000.0)
                 
             except Exception as e:
                 self.root.after(0, lambda: messagebox.showerror(
@@ -282,14 +468,29 @@ class MacroApp:
                     self.last_key = config.get('key', 'a')
                     self.last_interval = config.get('interval', '1000')
                     self.last_time_unit = config.get('time_unit', 'ms')
+                    self.last_random = config.get('random', False)
+                    self.last_min_interval = config.get('min_interval', '500')
+                    self.last_max_interval = config.get('max_interval', '1500')
+                    self.last_infinite = config.get('infinite', True)
+                    self.last_repeat = config.get('repeat', '100')
             else:
                 self.last_key = 'a'
                 self.last_interval = '1000'
                 self.last_time_unit = 'ms'
+                self.last_random = False
+                self.last_min_interval = '500'
+                self.last_max_interval = '1500'
+                self.last_infinite = True
+                self.last_repeat = '100'
         except Exception:
             self.last_key = 'a'
             self.last_interval = '1000'
             self.last_time_unit = 'ms'
+            self.last_random = False
+            self.last_min_interval = '500'
+            self.last_max_interval = '1500'
+            self.last_infinite = True
+            self.last_repeat = '100'
     
     def save_settings(self):
         """Ayarları kaydet"""
@@ -297,7 +498,12 @@ class MacroApp:
             config = {
                 'key': self.key_entry.get(),
                 'interval': self.interval_entry.get(),
-                'time_unit': self.time_unit.get()
+                'time_unit': self.time_unit.get(),
+                'random': self.random_var.get(),
+                'min_interval': self.min_interval_entry.get(),
+                'max_interval': self.max_interval_entry.get(),
+                'infinite': self.infinite_var.get(),
+                'repeat': self.repeat_entry.get()
             }
             with open(self.config_file, 'w', encoding='utf-8') as f:
                 json.dump(config, f, indent=4)

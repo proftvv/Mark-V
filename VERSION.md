@@ -1,5 +1,37 @@
 # Versiyon Geçmişi
 
+## v0.0.8 (23 Aralık 2025)
+
+### Değişiklikler:
+- 🔢 **Tekrar sayısı özelliği**
+  - Sonsuz mod veya belirli sayıda tekrar
+  - "X kere bas ve dur" özelliği
+  - Checkbox ile kolay geçiş
+- 🎲 **Rastgele aralık özelliği**
+  - Min-Max değer aralığında rastgele bekleme
+  - Daha doğal makro simulas yonu
+  - Checkbox ile aktif/pasif
+- 📊 **Canlı sayaç göstergesi**
+  - Toplam basış sayısı
+  - Kalan tekrar sayısı
+  - Gerçek zamanlı güncelleme
+- ⏸️ **Duraklat/Devam butonu**
+  - Makroyu durdurmadan duraklatma
+  - Tek tuşla devam ettirme
+  - Dinamik buton metni
+- 🎨 **UI iyileştirmeleri**
+  - Pencere boyutu büyütüldü (450x500)
+  - 3 buton sistemi (Başlat, Duraklat, Durdur)
+  - Daha organize layout
+  - Emoji ikonlar
+
+### Teknik Detaylar:
+- `random.randint()` ile rastgele aralık
+- `is_paused` state ile pause/resume
+- `remaining_count` ile tekrar takibi
+- Dinamik UI state yönetimi
+- Config dosyasına 4 yeni alan eklendi
+
 ## v0.0.7 (23 Aralık 2025)
 
 ### Değişiklikler:
