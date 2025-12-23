@@ -44,3 +44,5 @@ Thumbs.db
 # Project specific
 config.json
 settings.ini
+create_icon.py
+icon.png

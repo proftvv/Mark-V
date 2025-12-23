@@ -1,6 +1,6 @@
 """
 Mark-V - Macro Tuş Basma Programı
-Version: 0.0.3
+Version: 0.0.4
 """
 
 import tkinter as tk
@@ -16,9 +16,15 @@ import pystray
 class MacroApp:
     def __init__(self, root):
         self.root = root
-        self.root.title("Mark-V - Macro Tuş Basma")
+        self.root.title("Mark-V Private For ZORBEY <3")
         self.root.geometry("400x350")
         self.root.resizable(False, False)
+        
+        # Icon ayarla (eğer varsa)
+        try:
+            self.root.iconbitmap('icon.ico')
+        except:
+            pass
         
         self.is_running = False
         self.macro_thread = None
@@ -115,7 +121,7 @@ class MacroApp:
         # Versiyon
         version_label = tk.Label(
             self.root,
-            text="v0.0.3",
+            text="v0.0.4",
             font=("Arial", 8),
             fg="#95a5a6"
         )

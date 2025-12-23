@@ -1,5 +1,25 @@
 # Versiyon Geçmişi
 
+## v0.0.4 (23 Aralık 2025)
+
+### Değişiklikler:
+- 🎨 **Özel ikon eklendi**
+  - Uygulama ikonu olarak profil resmi kullanıldı
+  - icon.ico dosyası oluşturuldu
+  - PyInstaller --icon parametresi ile EXE'ye gömüldü
+- 📝 **Pencere başlığı kişiselleştirildi**
+  - "Mark-V Private For ZORBEY <3" başlığı
+  - tkinter iconbitmap() ile pencere ikonu
+- 🛠️ **Build süreci iyileştirildi**
+  - create_icon.py scripti eklendi
+  - PNG'den ICO'ya otomatik dönüştürme
+  - Çoklu boyut desteği (16x16 - 256x256)
+
+### Teknik Detaylar:
+- PIL/Pillow ile çoklu boyut icon oluşturma
+- Windows standart ikon boyutları desteği
+- root.iconbitmap() ile runtime icon
+
 ## v0.0.3 (23 Aralık 2025)
 
 ### Değişiklikler:
