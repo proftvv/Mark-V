@@ -1,13 +1,13 @@
 """
 Mark-V - Macro Tuş Basma Programı
-Version: 0.0.1
+Version: 0.0.2
 """
 
 import tkinter as tk
-from tkinter import ttk
+from tkinter import ttk, messagebox
 import threading
 import time
-from pynput import keyboard
+from pynput.keyboard import Key, Controller
 
 class MacroApp:
     def __init__(self, root):
@@ -18,6 +18,7 @@ class MacroApp:
         
         self.is_running = False
         self.macro_thread = None
+        self.keyboard_controller = Controller()
         
         self.setup_ui()
     
@@ -91,7 +92,7 @@ class MacroApp:
         # Versiyon
         version_label = tk.Label(
             self.root,
-            text="v0.0.1",
+            text="v0.0.2",
             font=("Arial", 8),
             fg="#95a5a6"
         )
@@ -99,17 +100,95 @@ class MacroApp:
     
     def start_macro(self):
         """Macro'yu başlat"""
-        # Placeholder - sonraki adımda implement edilecek
-        self.status_label.config(text="Durum: Çalışıyor...", fg="#27ae60")
-        self.start_button.config(state=tk.DISABLED)
-        self.stop_button.config(state=tk.NORMAL)
+        try:
+            # Tuş ve süre bilgilerini al
+            key = self.key_entry.get().strip()
+            interval = int(self.interval_entry.get())
+            
+            if not key:
+                messagebox.showerror("Hata", "Lütfen bir tuş girin!")
+                return
+            
+            if interval <= 0:
+                messagebox.showerror("Hata", "Aralık 0'dan büyük olmalıdır!")
+                return
+            
+            # Macro'yu başlat
+            self.is_running = True
+            self.macro_thread = threading.Thread(target=self.run_macro, args=(key, interval))
+            self.macro_thread.daemon = True
+            self.macro_thread.start()
+            
+            # UI güncellemeleri
+            self.status_label.config(text=f"Durum: Çalışıyor... ('{key}' her {interval}ms)", fg="#27ae60")
+            self.start_button.config(state=tk.DISABLED)
+            self.stop_button.config(state=tk.NORMAL)
+            self.key_entry.config(state=tk.DISABLED)
+            self.interval_entry.config(state=tk.DISABLED)
+            
+        except ValueError:
+            messagebox.showerror("Hata", "Aralık sayısal bir değer olmalıdır!")
     
     def stop_macro(self):
         """Macro'yu durdur"""
-        # Placeholder - sonraki adımda implement edilecek
+        self.is_running = False
+        
+        # UI güncellemeleri
         self.status_label.config(text="Durum: Durduruldu", fg="#e74c3c")
         self.start_button.config(state=tk.NORMAL)
         self.stop_button.config(state=tk.DISABLED)
+        self.key_entry.config(state=tk.NORMAL)
+        self.interval_entry.config(state=tk.NORMAL)
+    
+    def run_macro(self, key, interval):
+        """Macro döngüsü - ayrı thread'de çalışır"""
+        press_count = 0
+        
+        while self.is_running:
+            try:
+                # Tuşu bas
+                if len(key) == 1:
+                    # Tek karakter ise direkt bas
+                    self.keyboard_controller.press(key)
+                    self.keyboard_controller.release(key)
+                else:
+                    # Özel tuşlar için (space, enter, vb.)
+                    special_keys = {
+                        'space': Key.space,
+                        'enter': Key.enter,
+                        'tab': Key.tab,
+                        'esc': Key.esc,
+                        'shift': Key.shift,
+                        'ctrl': Key.ctrl,
+                        'alt': Key.alt
+                    }
+                    
+                    if key.lower() in special_keys:
+                        self.keyboard_controller.press(special_keys[key.lower()])
+                        self.keyboard_controller.release(special_keys[key.lower()])
+                    else:
+                        # Bilinmeyen tuş, yine de string olarak dene
+                        self.keyboard_controller.press(key)
+                        self.keyboard_controller.release(key)
+                
+                press_count += 1
+                
+                # Durum güncelleme (her 10 basışta bir)
+                if press_count % 10 == 0:
+                    self.root.after(0, lambda: self.status_label.config(
+                        text=f"Durum: Çalışıyor... ({press_count} basış)"
+                    ))
+                
+                # Bekleme süresi (milisaniye cinsinden)
+                time.sleep(interval / 1000.0)
+                
+            except Exception as e:
+                self.root.after(0, lambda: messagebox.showerror(
+                    "Hata", 
+                    f"Tuş basma hatası: {str(e)}"
+                ))
+                self.root.after(0, self.stop_macro)
+                break
 
 def main():
     root = tk.Tk()

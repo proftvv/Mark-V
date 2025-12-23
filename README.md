@@ -1,7 +1,8 @@
 # Mark-V - Macro Tuş Basma Programı
 
-![Version](https://img.shields.io/badge/version-0.0.1-blue)
+![Version](https://img.shields.io/badge/version-0.0.2-blue)
 ![Python](https://img.shields.io/badge/python-3.8+-green)
+![License](https://img.shields.io/badge/license-MIT-green)
 
 ## 📖 Açıklama
 
@@ -58,4 +59,4 @@ Bu program sadece eğitim amaçlıdır. Kullanımdan doğacak sorumluluk kullan�
 
 ## 📝 Lisans
 
-Bu proje kişisel kullanım içindir.
+Bu proje [MIT Lisansı](LICENSE) altında lisanslanmıştır.
