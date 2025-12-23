@@ -1,0 +1,8 @@
+# GUI Framework
+tkinter-tooltip==2.1.0
+
+# Keyboard/Mouse Control
+pynput==1.7.6
+
+# EXE Builder
+pyinstaller==6.3.0
