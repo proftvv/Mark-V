@@ -1,5 +1,36 @@
 # Versiyon Geçmişi
 
+## v0.0.9-R2 (23 Aralık 2025)
+
+### Düzeltmeler:
+- 🎨 **Dark tema düzeltmesi**
+  - Entry'ler artık dark temada siyah arka plan alıyor
+  - Tüm widget'lar (button, label, frame, entry, checkbutton) tema ile güncelleniyor
+  - Recursive tema güncelleme ile tüm alt widget'lar da güncelleniyor
+  - Entry insert cursor rengi tema ile uyumlu
+- 📌 **Versiyon numarası düzeltmesi**
+  - Alt tarafta v0.0.9-R2 görünüyor
+  - Footer frame eklendi
+- 🖼️ **Tray icon düzeltmesi**
+  - Icon 64x64 boyutuna ölçekleniyor
+  - LANCZOS resampling ile daha kaliteli görüntü
+  - PNG fallback desteği
+- 👨‍💻 **Developer bilgisi eklendi**
+  - "Developed by Proftvv" yazısı alt tarafta
+  - Tıklanabilir link
+- 🔗 **GitHub linki eklendi**
+  - ⚙️ ikonu ile GitHub profil linki
+  - https://github.com/proftvv/ adresine yönlendirme
+  - webbrowser modülü ile otomatik açılma
+
+### Teknik Detaylar:
+- `update_widget_theme_recursive()` ile recursive widget güncelleme
+- `entry_bg`, `entry_fg`, `button_bg` tema renkleri eklendi
+- `insertbackground` ile cursor rengi güncelleme
+- `Image.Resampling.LANCZOS` ile kaliteli ölçekleme
+- `webbrowser.open()` ile GitHub linki
+- Pencere boyutu 450x600'e genişletildi
+
 ## v0.0.9 (23 Aralık 2025)
 
 ### Değişiklikler:

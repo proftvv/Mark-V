@@ -1,6 +1,6 @@
 """
 Mark-V - Macro Tuş Basma Programı
-Version: 0.0.9
+Version: 0.0.9-R2
 """
 
 import tkinter as tk
@@ -19,7 +19,7 @@ class MacroApp:
     def __init__(self, root):
         self.root = root
         self.root.title("Mark-V | Private For ZORBEY <3")
-        self.root.geometry("450x500")
+        self.root.geometry("450x600")
         self.root.resizable(False, False)
         self.root.configure(bg='#ecf0f1')  # Açık gri arka plan
         
@@ -47,12 +47,18 @@ class MacroApp:
             'light': {
                 'bg': '#ecf0f1',
                 'fg': '#2c3e50',
-                'secondary': '#7f8c8d'
+                'secondary': '#7f8c8d',
+                'entry_bg': 'white',
+                'entry_fg': 'black',
+                'button_bg': '#3498db'
             },
             'dark': {
                 'bg': '#2c3e50',
                 'fg': '#ecf0f1',
-                'secondary': '#95a5a6'
+                'secondary': '#95a5a6',
+                'entry_bg': '#34495e',
+                'entry_fg': '#ecf0f1',
+                'button_bg': '#2980b9'
             }
         }
         self.current_theme = 'light'
@@ -300,15 +306,51 @@ class MacroApp:
         )
         theme_btn.pack(pady=5)
         
+        # Alt bilgi frame
+        footer_frame = tk.Frame(self.root, bg='#ecf0f1')
+        footer_frame.pack(side=tk.BOTTOM, pady=10)
+        
+        # GitHub linki
+        github_frame = tk.Frame(footer_frame, bg='#ecf0f1')
+        github_frame.pack(pady=2)
+        
+        github_label = tk.Label(
+            github_frame,
+            text="⚙️",
+            font=("Arial", 10),
+            fg="#333333",
+            bg='#ecf0f1',
+            cursor="hand2"
+        )
+        github_label.pack(side=tk.LEFT, padx=2)
+        github_label.bind("<Button-1>", lambda e: self.open_github())
+        
+        dev_label = tk.Label(
+            github_frame,
+            text="Developed by Proftvv",
+            font=("Arial", 9),
+            fg="#7f8c8d",
+            bg='#ecf0f1',
+            cursor="hand2"
+        )
+        dev_label.pack(side=tk.LEFT)
+        dev_label.bind("<Button-1>", lambda e: self.open_github())
+        
         # Versiyon
         version_label = tk.Label(
-            self.root,
-            text="v0.0.9",
+            footer_frame,
+            text="v0.0.9-R2",
             font=("Arial", 8),
             fg="#95a5a6",
             bg='#ecf0f1'
         )
-        version_label.pack(side=tk.BOTTOM, pady=5)
+        version_label.pack(pady=2)
+        
+        # Widget referanslarını sakla (tema için)
+        self.all_buttons = [self.start_button, self.pause_button, self.stop_button, theme_btn]
+        self.all_entries = [self.key_entry, self.interval_entry, self.min_interval_entry, self.max_interval_entry, self.repeat_entry]
+        self.all_labels = [title_label, hotkey_info, self.counter_label, self.status_label, version_label, dev_label, github_label]
+        self.all_frames = [key_frame, interval_frame, random_frame, repeat_frame, button_frame, counter_frame, stats_frame, footer_frame, github_frame]
     
     def toggle_random(self):
         """Rastgele aralık toggle"""
@@ -660,7 +702,8 @@ class MacroApp:
         self.key_capture_mode = False
         self.key_entry.delete(0, tk.END)
         self.key_entry.insert(0, captured_key)
-        self.key_entry.config(bg="white")
+        theme = self.themes[self.current_theme]
+        self.key_entry.config(bg=theme['entry_bg'], fg=theme['entry_fg'])
         
         if self.key_capture_listener:
             self.key_capture_listener.stop()
@@ -686,35 +729,80 @@ class MacroApp:
         self.current_theme = 'dark' if self.current_theme == 'light' else 'light'
         theme = self.themes[self.current_theme]
         
-        # Tüm widget'ları güncelle
+        # Ana pencere
         self.root.config(bg=theme['bg'])
         
-        for widget in self.root.winfo_children():
-            self.update_widget_theme(widget, theme)
+        # Tüm frame'ler ve label'lar
+        for widget in self.all_frames + self.all_labels:
+            try:
+                widget.config(bg=theme['bg'], fg=theme['fg'])
+            except:
+                pass
+        
+        # Entry'ler
+        for entry in self.all_entries:
+            try:
+                entry.config(bg=theme['entry_bg'], fg=theme['entry_fg'], insertbackground=theme['entry_fg'])
+            except:
+                pass
+        
+        # Checkbutton'lar
+        try:
+            for widget in self.root.winfo_children():
+                self.update_widget_theme_recursive(widget, theme)
+        except:
+            pass
+        
+        # İstatistikler
+        try:
+            self.elapsed_time_label.config(bg=theme['bg'], fg=theme['fg'])
+            self.total_presses_label.config(bg=theme['bg'], fg=theme['fg'])
+        except:
+            pass
+        
+        # Durum label
+        try:
+            self.status_label.config(bg=theme['bg'])
+        except:
+            pass
         
         self.save_settings()
     
-    def update_widget_theme(self, widget, theme):
-        """Widget temasını güncelle"""
+    def update_widget_theme_recursive(self, widget, theme):
+        """Widget temasını recursive güncelle"""
         try:
             widget_type = widget.winfo_class()
             
-            if widget_type in ['Label', 'Frame', 'Checkbutton']:
+            if widget_type in ['Label', 'Checkbutton']:
                 widget.config(bg=theme['bg'], fg=theme['fg'])
+            elif widget_type == 'Frame':
+                widget.config(bg=theme['bg'])
             elif widget_type == 'LabelFrame':
                 widget.config(bg=theme['bg'], fg=theme['fg'])
             
             # Alt widget'ları da güncelle
             for child in widget.winfo_children():
-                self.update_widget_theme(child, theme)
+                self.update_widget_theme_recursive(child, theme)
         except:
             pass
+    
+    def open_github(self):
+        """GitHub profilini aç"""
+        import webbrowser
+        webbrowser.open("https://github.com/proftvv/")
     
     def setup_tray(self):
         """Sistem tepsisi ikonu oluştur"""
         try:
-            # İkon oluştur
-            icon_image = Image.open('icon.ico')
+            # İkon oluştur - PNG'den yükle ve dönüştür
+            try:
+                icon_image = Image.open('icon.ico')
+            except:
+                # icon.ico yoksa icon.png'den oluştur
+                icon_image = Image.open('icon.png')
+            
+            # Tray için uygun boyuta getir
+            icon_image = icon_image.resize((64, 64), Image.Resampling.LANCZOS)
             
             # Tray menüsü
             menu = pystray.Menu(
