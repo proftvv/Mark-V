@@ -1,6 +1,6 @@
 """
 Mark-V - Macro Tuş Basma Programı
-Version: 0.0.9-R4
+Version: 0.0.9-R5
 """
 
 import tkinter as tk
@@ -12,8 +12,6 @@ import os
 import random
 from datetime import datetime, timedelta
 from pynput.keyboard import Key, Controller, Listener
-from PIL import Image, ImageDraw, ImageTk
-import pystray
 
 class MacroApp:
     def __init__(self, root):
@@ -34,7 +32,6 @@ class MacroApp:
         self.macro_thread = None
         self.keyboard_controller = Controller()
         self.hotkey_listener = None
-        self.tray_icon = None
         self.key_capture_mode = False
         self.key_capture_listener = None
         self.press_count = 0
@@ -48,35 +45,12 @@ class MacroApp:
         
         self.setup_ui()
         self.start_hotkey_listener()
-        self.setup_tray()
         
         # Pencere kapatma olayı
         self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
-        # Minimize olayı
-        self.root.bind('<Unmap>', self.on_minimize)
     
     def setup_ui(self):
         """Kullanıcı arayüzünü oluştur"""
-        # Arka plan resmi (siluet/watermark)
-        try:
-            import sys
-            if getattr(sys, 'frozen', False):
-                # PyInstaller ile paketlenmişse
-                base_path = sys._MEIPASS
-            else:
-                # Normal Python çalıştırılması
-                base_path = os.path.dirname(os.path.abspath(__file__))
-            
-            bg_path = os.path.join(base_path, 'background.png')
-            bg_image = Image.open(bg_path)
-            bg_photo = ImageTk.PhotoImage(bg_image)
-            bg_label = tk.Label(self.root, image=bg_photo, bg='#ecf0f1')
-            bg_label.image = bg_photo  # Referansı sakla
-            bg_label.place(relx=0.5, rely=0.5, anchor='center')
-        except Exception as e:
-            print(f"Background yüklenemedi: {e}")
-            pass  # Resim yoksa devam et
-        
         # Başlık
         title_label = tk.Label(
             self.root, 
@@ -311,7 +285,7 @@ class MacroApp:
         # Versiyon
         version_label = tk.Label(
             footer_frame,
-            text="v0.0.9-R4",
+            text="v0.0.9-R5",
             font=("Arial", 8),
             fg="#95a5a6",
             bg='#ecf0f1'
@@ -626,10 +600,6 @@ class MacroApp:
             if not result:
                 return
         
-        # Tray'i kapat
-        if self.tray_icon:
-            self.tray_icon.stop()
-        
         # Listener'ı durdur
         if self.hotkey_listener:
             self.hotkey_listener.stop()
@@ -690,63 +660,6 @@ class MacroApp:
         """GitHub profilini aç"""
         import webbrowser
         webbrowser.open("https://github.com/proftvv/")
-    
-    def setup_tray(self):
-        """Sistem tepsisi ikonu oluştur"""
-        try:
-            # İkon oluştur - PNG'den yükle ve dönüştür
-            try:
-                icon_image = Image.open('icon.ico')
-            except:
-                # icon.ico yoksa icon.png'den oluştur
-                icon_image = Image.open('icon.png')
-            
-            # Tray için uygun boyuta getir
-            icon_image = icon_image.resize((64, 64), Image.Resampling.LANCZOS)
-            
-            # Tray menüsü
-            menu = pystray.Menu(
-                pystray.MenuItem("Göster", self.show_window),
-                pystray.MenuItem("Gizle", self.hide_window),
-                pystray.MenuItem("Çıkış", self.quit_app)
-            )
-            
-            # Tray ikonu
-            self.tray_icon = pystray.Icon("Mark-V", icon_image, "Mark-V Macro", menu)
-            
-            # Tray'i arka planda çalıştır
-            threading.Thread(target=self.tray_icon.run, daemon=True).start()
-        except Exception as e:
-            print(f"Tray ikon hatası: {e}")
-    
-    def show_window(self, icon=None, item=None):
-        """Pencereyi göster"""
-        self.root.deiconify()
-        self.root.lift()
-        self.root.focus_force()
-    
-    def hide_window(self, icon=None, item=None):
-        """Pencereyi gizle"""
-        self.root.withdraw()
-    
-    def on_minimize(self, event):
-        """Minimize olayında tray'e gönder"""
-        if str(event.widget) == '.':
-            # Ana pencere minimize edildiğinde gizle
-            self.root.after(100, self.hide_window)
-    
-    def quit_app(self, icon=None, item=None):
-        """Uygulamayı kapat"""
-        if self.tray_icon:
-            self.tray_icon.stop()
-        
-        if self.hotkey_listener:
-            self.hotkey_listener.stop()
-        
-        if self.key_capture_listener:
-            self.key_capture_listener.stop()
-        
-        self.root.quit()
     
     def update_elapsed_time(self):
         """Geçen süreyi güncelle"""

@@ -1,5 +1,35 @@
 # Versiyon Geçmişi
 
+## v0.0.9-R5 (23 Aralık 2025)
+
+### Değişiklikler:
+- ❌ **Background tamamen kaldırıldı**
+  - Arka plan watermark/siluet görseli kaldırıldı
+  - PIL/Pillow bağımlılığı kaldırıldı
+  - Daha hızlı yüklenme
+  - Daha küçük EXE dosyası
+- ❌ **Tray sistemi kaldırıldı**
+  - pystray bağımlılığı kaldırıldı
+  - Sistem tepsisi ikonu kaldırıldı
+  - Normal Windows minimize davranışı
+  - Daha basit kullanım
+- 🖼️ **Icon iyileştirmesi**
+  - Sadece icon.ico kullanılıyor
+  - Windows taskbar'da düzgün görünüyor
+  - Daha küçük paket boyutu
+- 🧹 **Kod temizliği**
+  - setup_tray() fonksiyonu kaldırıldı
+  - show_window(), hide_window(), on_minimize(), quit_app() fonksiyonları kaldırıldı
+  - PIL/Pillow import'u kaldırıldı
+  - pystray import'u kaldırıldı
+  - 70+ satır gereksiz kod kaldırıldı
+
+### Teknik Detaylar:
+- Sadece tkinter ve pynput bağımlılıkları
+- EXE boyutu ~8MB azaldı
+- Daha hızlı başlangıç süresi
+- Daha az RAM kullanımı
+
 ## v0.0.9-R4 (23 Aralık 2025)
 
 ### Değişiklikler:
