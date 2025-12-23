@@ -1,5 +1,30 @@
 # Versiyon Geçmişi
 
+## v0.0.9-R4 (23 Aralık 2025)
+
+### Değişiklikler:
+- ❌ **Dark tema kaldırıldı**
+  - Tema değiştir butonu kaldırıldı
+  - Tema renk sistemi tamamen kaldırıldı
+  - Sadece light tema kullanılıyor
+  - Daha basit ve temiz kod yapısı
+- 🖼️ **Icon ve background düzeltmeleri**
+  - Background için sys._MEIPASS kontrolü eklendi
+  - PyInstaller ile paketlenmiş EXE'de background düzgün yükleniyor
+  - Icon.ico Windows taskbar'da görünüyor
+  - Tray icon düzgün görünüyor
+- 🧹 **Kod temizliği**
+  - toggle_theme() fonksiyonu kaldırıldı
+  - update_widget_theme_recursive() fonksiyonu kaldırıldı
+  - Config'den theme alanı kaldırıldı
+  - Gereksiz widget referansları kaldırıldı
+
+### Teknik Detaylar:
+- `sys._MEIPASS` ile PyInstaller resource path çözümü
+- `os.path.join()` ile platform-bağımsız path
+- Background için exception handling iyileştirildi
+- Daha az kod, daha stabil çalışma
+
 ## v0.0.9-R3 (23 Aralık 2025)
 
 ### Değişiklikler:

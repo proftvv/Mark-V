@@ -1,6 +1,6 @@
 """
 Mark-V - Macro Tuş Basma Programı
-Version: 0.0.9-R3
+Version: 0.0.9-R4
 """
 
 import tkinter as tk
@@ -42,31 +42,6 @@ class MacroApp:
         self.start_time = None
         self.total_session_presses = 0
         
-        # Tema renkleri
-        self.themes = {
-            'light': {
-                'bg': '#ecf0f1',           # Açık gri arka plan
-                'fg': '#2c3e50',           # Koyu metin
-                'secondary': '#7f8c8d',     # İkincil metin
-                'entry_bg': 'white',        # Entry arka plan
-                'entry_fg': 'black',        # Entry metin
-                'button_bg': '#3498db',     # Mavi buton
-                'frame_bg': '#ecf0f1',      # Frame arka plan
-                'label_frame_bg': '#ecf0f1' # LabelFrame arka plan
-            },
-            'dark': {
-                'bg': '#1e272e',           # Koyu gri-mavi arka plan
-                'fg': '#f5f6fa',           # Açık beyaz metin
-                'secondary': '#a4b0be',     # Gri ikincil metin
-                'entry_bg': '#2f3640',      # Koyu gri entry
-                'entry_fg': '#f5f6fa',      # Açık metin
-                'button_bg': '#0984e3',     # Parlak mavi buton
-                'frame_bg': '#1e272e',      # Frame arka plan
-                'label_frame_bg': '#2f3640' # LabelFrame arka plan (daha açık)
-            }
-        }
-        self.current_theme = 'light'
-        
         # Ayarlar dosyası
         self.config_file = "config.json"
         self.load_settings()
@@ -74,10 +49,6 @@ class MacroApp:
         self.setup_ui()
         self.start_hotkey_listener()
         self.setup_tray()
-        
-        # Temayı uygula
-        if self.current_theme == 'dark':
-            self.root.after(100, self.toggle_theme)
         
         # Pencere kapatma olayı
         self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
@@ -88,12 +59,22 @@ class MacroApp:
         """Kullanıcı arayüzünü oluştur"""
         # Arka plan resmi (siluet/watermark)
         try:
-            bg_image = Image.open('background.png')
+            import sys
+            if getattr(sys, 'frozen', False):
+                # PyInstaller ile paketlenmişse
+                base_path = sys._MEIPASS
+            else:
+                # Normal Python çalıştırılması
+                base_path = os.path.dirname(os.path.abspath(__file__))
+            
+            bg_path = os.path.join(base_path, 'background.png')
+            bg_image = Image.open(bg_path)
             bg_photo = ImageTk.PhotoImage(bg_image)
-            bg_label = tk.Label(self.root, image=bg_photo)
+            bg_label = tk.Label(self.root, image=bg_photo, bg='#ecf0f1')
             bg_label.image = bg_photo  # Referansı sakla
             bg_label.place(relx=0.5, rely=0.5, anchor='center')
-        except:
+        except Exception as e:
+            print(f"Background yüklenemedi: {e}")
             pass  # Resim yoksa devam et
         
         # Başlık
@@ -297,19 +278,6 @@ class MacroApp:
         )
         self.total_presses_label.pack(pady=2)
         
-        # Tema toggle butonu
-        theme_btn = tk.Button(
-            self.root,
-            text="🌓 Tema Değiştir",
-            command=self.toggle_theme,
-            font=("Arial", 9),
-            bg="#9b59b6",
-            fg="white",
-            cursor="hand2",
-            width=15
-        )
-        theme_btn.pack(pady=5)
-        
         # Alt bilgi frame
         footer_frame = tk.Frame(self.root, bg='#ecf0f1')
         footer_frame.pack(side=tk.BOTTOM, pady=10)
@@ -343,18 +311,12 @@ class MacroApp:
         # Versiyon
         version_label = tk.Label(
             footer_frame,
-            text="v0.0.9-R3",
+            text="v0.0.9-R4",
             font=("Arial", 8),
             fg="#95a5a6",
             bg='#ecf0f1'
         )
         version_label.pack(pady=2)
-        
-        # Widget referanslarını sakla (tema için)
-        self.all_buttons = [self.start_button, self.pause_button, self.stop_button, theme_btn]
-        self.all_entries = [self.key_entry, self.interval_entry, self.min_interval_entry, self.max_interval_entry, self.repeat_entry]
-        self.all_labels = [title_label, hotkey_info, self.counter_label, self.status_label, version_label, dev_label, github_label]
-        self.all_frames = [key_frame, interval_frame, random_frame, repeat_frame, button_frame, counter_frame, stats_frame, footer_frame, github_frame]
     
     def toggle_random(self):
         """Rastgele aralık toggle"""
@@ -596,7 +558,6 @@ class MacroApp:
                     self.last_max_interval = config.get('max_interval', '1500')
                     self.last_infinite = config.get('infinite', True)
                     self.last_repeat = config.get('repeat', '100')
-                    self.current_theme = config.get('theme', 'light')
             else:
                 self.last_key = 'a'
                 self.last_interval = '1000'
@@ -627,8 +588,7 @@ class MacroApp:
                 'min_interval': self.min_interval_entry.get(),
                 'max_interval': self.max_interval_entry.get(),
                 'infinite': self.infinite_var.get(),
-                'repeat': self.repeat_entry.get(),
-                'theme': self.current_theme
+                'repeat': self.repeat_entry.get()
             }
             with open(self.config_file, 'w', encoding='utf-8') as f:
                 json.dump(config, f, indent=4)
@@ -706,8 +666,7 @@ class MacroApp:
         self.key_capture_mode = False
         self.key_entry.delete(0, tk.END)
         self.key_entry.insert(0, captured_key)
-        theme = self.themes[self.current_theme]
-        self.key_entry.config(bg=theme['entry_bg'], fg=theme['entry_fg'])
+        self.key_entry.config(bg="white", fg="black")
         
         if self.key_capture_listener:
             self.key_capture_listener.stop()
@@ -726,71 +685,6 @@ class MacroApp:
                 return str(key).replace("'", "")
         except:
             return str(key).replace("'", "")
-    
-    def toggle_theme(self):
-        """Tema değiştir (açık/koyu)"""
-        # Tema değiştir
-        self.current_theme = 'dark' if self.current_theme == 'light' else 'light'
-        theme = self.themes[self.current_theme]
-        
-        # Ana pencere
-        self.root.config(bg=theme['bg'])
-        
-        # Tüm frame'ler ve label'lar
-        for widget in self.all_frames + self.all_labels:
-            try:
-                widget.config(bg=theme['bg'], fg=theme['fg'])
-            except:
-                pass
-        
-        # Entry'ler
-        for entry in self.all_entries:
-            try:
-                entry.config(bg=theme['entry_bg'], fg=theme['entry_fg'], insertbackground=theme['entry_fg'])
-            except:
-                pass
-        
-        # Checkbutton'lar
-        try:
-            for widget in self.root.winfo_children():
-                self.update_widget_theme_recursive(widget, theme)
-        except:
-            pass
-        
-        # İstatistikler
-        try:
-            self.elapsed_time_label.config(bg=theme['label_frame_bg'], fg=theme['fg'])
-            self.total_presses_label.config(bg=theme['label_frame_bg'], fg=theme['fg'])
-        except:
-            pass
-        
-        # Durum label
-        try:
-            self.status_label.config(bg=theme['bg'])
-        except:
-            pass
-        
-        self.save_settings()
-    
-    def update_widget_theme_recursive(self, widget, theme):
-        """Widget temasını recursive güncelle"""
-        try:
-            widget_type = widget.winfo_class()
-            
-            if widget_type in ['Label', 'Checkbutton']:
-                widget.config(bg=theme['bg'], fg=theme['fg'])
-            elif widget_type == 'Frame':
-                widget.config(bg=theme['bg'])
-            elif widget_type == 'LabelFrame':
-                # LabelFrame için özel arka plan rengi
-                widget.config(bg=theme['label_frame_bg'], fg=theme['fg'])
-            
-            # Alt widget'ları da güncelle
-            for child in widget.winfo_children():
-                self.update_widget_theme_recursive(child, theme)
-        except:
-            pass
-            pass
     
     def open_github(self):
         """GitHub profilini aç"""
