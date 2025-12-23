@@ -1,6 +1,6 @@
 """
 Mark-V - Macro Tuş Basma Programı
-Version: 0.0.5
+Version: 0.0.6
 """
 
 import tkinter as tk
@@ -31,6 +31,8 @@ class MacroApp:
         self.keyboard_controller = Controller()
         self.hotkey_listener = None
         self.tray_icon = None
+        self.key_capture_mode = False
+        self.key_capture_listener = None
         
         # Ayarlar dosyası
         self.config_file = "config.json"
@@ -67,18 +69,43 @@ class MacroApp:
         key_frame.pack(pady=10)
         
         tk.Label(key_frame, text="Tuş:", font=("Arial", 10)).pack(side=tk.LEFT, padx=5)
-        self.key_entry = tk.Entry(key_frame, width=10, font=("Arial", 10))
+        self.key_entry = tk.Entry(key_frame, width=15, font=("Arial", 10))
         self.key_entry.insert(0, self.last_key)
         self.key_entry.pack(side=tk.LEFT, padx=5)
+        
+        # Tuş yakalama butonu
+        capture_btn = tk.Button(
+            key_frame,
+            text="🎯 Yakala",
+            command=self.start_key_capture,
+            font=("Arial", 9),
+            bg="#3498db",
+            fg="white",
+            cursor="hand2",
+            width=8
+        )
+        capture_btn.pack(side=tk.LEFT, padx=5)
         
         # Süre ayarı
         interval_frame = tk.Frame(self.root)
         interval_frame.pack(pady=10)
         
-        tk.Label(interval_frame, text="Aralık (ms):", font=("Arial", 10)).pack(side=tk.LEFT, padx=5)
-        self.interval_entry = tk.Entry(interval_frame, width=10, font=("Arial", 10))
+        tk.Label(interval_frame, text="Aralık:", font=("Arial", 10)).pack(side=tk.LEFT, padx=5)
+        self.interval_entry = tk.Entry(interval_frame, width=8, font=("Arial", 10))
         self.interval_entry.insert(0, self.last_interval)
         self.interval_entry.pack(side=tk.LEFT, padx=5)
+        
+        # Zaman birimi seçici
+        self.time_unit = tk.StringVar(value=getattr(self, 'last_time_unit', 'ms'))
+        self.time_unit_combo = ttk.Combobox(
+            interval_frame,
+            textvariable=self.time_unit,
+            values=["ms", "saniye"],
+            state="readonly",
+            width=7,
+            font=("Arial", 9)
+        )
+        self.time_unit_combo.pack(side=tk.LEFT, padx=5)
         
         # Kontrol butonları
         button_frame = tk.Frame(self.root)
@@ -121,7 +148,7 @@ class MacroApp:
         # Versiyon
         version_label = tk.Label(
             self.root,
-            text="v0.0.5",
+            text="v0.0.6",
             font=("Arial", 8),
             fg="#95a5a6"
         )
@@ -132,19 +159,26 @@ class MacroApp:
         try:
             # Tuş ve süre bilgilerini al
             key = self.key_entry.get().strip()
-            interval = int(self.interval_entry.get())
+            interval_value = int(self.interval_entry.get())
+            time_unit = self.time_unit.get()
             
             if not key:
                 messagebox.showerror("Hata", "Lütfen bir tuş girin!")
                 return
             
-            if interval <= 0:
+            if interval_value <= 0:
                 messagebox.showerror("Hata", "Aralık 0'dan büyük olmalıdır!")
                 return
             
+            # Zaman birimini milisaniyeye çevir
+            if time_unit == "saniye":
+                interval_ms = interval_value * 1000
+            else:
+                interval_ms = interval_value
+            
             # Macro'yu başlat
             self.is_running = True
-            self.macro_thread = threading.Thread(target=self.run_macro, args=(key, interval))
+            self.macro_thread = threading.Thread(target=self.run_macro, args=(key, interval_ms))
             self.macro_thread.daemon = True
             self.macro_thread.start()
             
@@ -152,11 +186,12 @@ class MacroApp:
             self.save_settings()
             
             # UI güncellemeleri
-            self.status_label.config(text=f"Durum: Çalışıyor... ('{key}' her {interval}ms)", fg="#27ae60")
+            self.status_label.config(text=f"Durum: Çalışıyor... ('{key}' her {interval_value}{time_unit})", fg="#27ae60")
             self.start_button.config(state=tk.DISABLED)
             self.stop_button.config(state=tk.NORMAL)
             self.key_entry.config(state=tk.DISABLED)
             self.interval_entry.config(state=tk.DISABLED)
+            self.time_unit_combo.config(state=tk.DISABLED)
             
         except ValueError:
             messagebox.showerror("Hata", "Aralık sayısal bir değer olmalıdır!")
@@ -171,6 +206,7 @@ class MacroApp:
         self.stop_button.config(state=tk.DISABLED)
         self.key_entry.config(state=tk.NORMAL)
         self.interval_entry.config(state=tk.NORMAL)
+        self.time_unit_combo.config(state="readonly")
     
     def run_macro(self, key, interval):
         """Macro döngüsü - ayrı thread'de çalışır"""
@@ -230,19 +266,23 @@ class MacroApp:
                     config = json.load(f)
                     self.last_key = config.get('key', 'a')
                     self.last_interval = config.get('interval', '1000')
+                    self.last_time_unit = config.get('time_unit', 'ms')
             else:
                 self.last_key = 'a'
                 self.last_interval = '1000'
+                self.last_time_unit = 'ms'
         except Exception:
             self.last_key = 'a'
             self.last_interval = '1000'
+            self.last_time_unit = 'ms'
     
     def save_settings(self):
         """Ayarları kaydet"""
         try:
             config = {
                 'key': self.key_entry.get(),
-                'interval': self.interval_entry.get()
+                'interval': self.interval_entry.get(),
+                'time_unit': self.time_unit.get()
             }
             with open(self.config_file, 'w', encoding='utf-8') as f:
                 json.dump(config, f, indent=4)
@@ -284,7 +324,57 @@ class MacroApp:
         if self.hotkey_listener:
             self.hotkey_listener.stop()
         
+        # Tuş yakalama listener'ı durdur
+        if self.key_capture_listener:
+            self.key_capture_listener.stop()
+        
         self.root.destroy()
+    
+    def start_key_capture(self):
+        """Tuş yakalama modunu başlat"""
+        if self.is_running:
+            messagebox.showwarning("Uyarı", "Önce macro'yu durdurun!")
+            return
+        
+        self.key_capture_mode = True
+        self.key_entry.delete(0, tk.END)
+        self.key_entry.insert(0, "Bir tuşa basın...")
+        self.key_entry.config(bg="#fff3cd")
+        
+        # Tuş yakalama listener'ı başlat
+        def on_key_press(key):
+            if self.key_capture_mode:
+                captured_key = self.format_key(key)
+                self.root.after(0, lambda: self.finish_key_capture(captured_key))
+                return False  # Listener'ı durdur
+        
+        self.key_capture_listener = Listener(on_press=on_key_press)
+        self.key_capture_listener.start()
+    
+    def finish_key_capture(self, captured_key):
+        """Tuş yakalamayı tamamla"""
+        self.key_capture_mode = False
+        self.key_entry.delete(0, tk.END)
+        self.key_entry.insert(0, captured_key)
+        self.key_entry.config(bg="white")
+        
+        if self.key_capture_listener:
+            self.key_capture_listener.stop()
+            self.key_capture_listener = None
+    
+    def format_key(self, key):
+        """Tuşu formatla"""
+        try:
+            # Özel tuşlar
+            if hasattr(key, 'name'):
+                return key.name
+            # Normal karakterler
+            elif hasattr(key, 'char') and key.char:
+                return key.char
+            else:
+                return str(key).replace("'", "")
+        except:
+            return str(key).replace("'", "")
 
 def main():
     root = tk.Tk()

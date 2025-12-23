@@ -1,5 +1,31 @@
 # Versiyon Geçmişi
 
+## v0.0.6 (23 Aralık 2025)
+
+### Değişiklikler:
+- ⏱️ **Zaman birimi seçici eklendi**
+  - Milisaniye (ms) veya Saniye seçeneği
+  - Combobox ile kolay seçim
+  - Otomatik dönüştürme (saniye -> ms)
+  - Ayarlarda zaman birimi kaydetme
+- 🎯 **Otomatik tuş yakalama**
+  - "🎯 Yakala" butonu eklendi
+  - Butona tıklayıp bir tuşa basınca otomatik algılama
+  - pynput.Listener ile gerçek zamanlı tuş yakalama
+  - Tüm tuşlar desteklenir (a-z, 0-9, space, enter, shift, vb.)
+  - Visual feedback (sarı arka plan)
+- 🎨 **UI iyileştirmeleri**
+  - Genişletilmiş tuş input alanı
+  - Zaman birimi combobox'u
+  - Daha düzgün layout
+  - Responsive buton durumları
+
+### Teknik Detaylar:
+- `ttk.Combobox` ile zaman birimi seçici
+- `pynput.Listener` ile ayrı tuş yakalama listener'ı
+- `format_key()` metodu ile tuş formatlaması
+- Config dosyasına time_unit eklendi
+
 ## v0.0.5 (23 Aralık 2025)
 
 ### Değişiklikler:
