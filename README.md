@@ -1,6 +1,6 @@
 # Mark-V - Macro Tuş Basma Programı
 
-![Version](https://img.shields.io/badge/version-1.0.0-brightgreen)
+![Version](https://img.shields.io/badge/version-1.0.1-brightgreen)
 ![Status](https://img.shields.io/badge/status-stable-success)
 ![Python](https://img.shields.io/badge/python-3.8+-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
@@ -16,6 +16,7 @@ Mark-V, belirli bir tuşu ayarlanabilir aralıklarla otomatik olarak basan profe
 - ⌨️ **Tuş Kontrolü**: Herhangi bir tuşu otomatik basma
 - 🎯 **Otomatik Yakalama**: Tuş yakalama butonu ile kolay ayarlama
 - 🔥 **F9 Hotkey**: Hızlı başlat/durdur kısayolu
+- ⏸️ **F10 Hotkey**: Hızlı duraklat/devam kısayolu
 - ⏱️ **Zaman Ayarı**: Milisaniye veya saniye cinsinden hassas zamanlama
 - 🎲 **Rastgele Aralık**: Min-Max değer aralığında doğal simülasyon
 - 🔢 **Tekrar Kontrolü**: Sonsuz veya belirli sayıda tekrar
@@ -36,7 +37,7 @@ Mark-V, belirli bir tuşu ayarlanabilir aralıklarla otomatik olarak basan profe
 ## 🚀 Kurulum
 
 ### Seçenek 1: EXE Dosyası (Önerilen)
-1. [Releases](https://github.com/proftvv/Mark-V/releases) sayfasından `Mark-V-v1.0.0.exe` dosyasını indirin
+1. [Releases](https://github.com/proftvv/Mark-V/releases) sayfasından `Mark-V-v1.0.1.exe` dosyasını indirin
 2. İndirilen EXE'yi çalıştırın
 3. Python kurulumuna gerek yok!
 

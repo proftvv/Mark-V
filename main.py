@@ -1,6 +1,6 @@
 """
 Mark-V - Macro Tuş Basma Programı
-Version: 1.0.0
+Version: 1.0.1
 """
 
 import tkinter as tk
@@ -64,7 +64,7 @@ class MacroApp:
         # Hotkey bilgisi
         hotkey_info = tk.Label(
             self.root,
-            text="⌨️ Kısayol: F9 (Başlat/Durdur)",
+            text="⌨️ Kısayollar: F9 (Başlat/Durdur) | F10 (Duraklat/Devam)",
             font=("Arial", 9),
             fg="#7f8c8d",
             bg='#ecf0f1'
@@ -285,7 +285,7 @@ class MacroApp:
         # Versiyon
         version_label = tk.Label(
             footer_frame,
-            text="v1.0.0",
+            text="v1.0.1",
             font=("Arial", 8),
             fg="#95a5a6",
             bg='#ecf0f1'
@@ -573,9 +573,12 @@ class MacroApp:
         """Hotkey listener'ı başlat"""
         def on_press(key):
             try:
-                # F9 tuşu kontrolü
+                # F9 tuşu kontrolü - Başlat/Durdur
                 if key == Key.f9:
                     self.root.after(0, self.toggle_macro)
+                # F10 tuşu kontrolü - Duraklat/Devam
+                elif key == Key.f10:
+                    self.root.after(0, self.toggle_pause)
             except Exception:
                 pass
         
@@ -589,6 +592,11 @@ class MacroApp:
             self.stop_macro()
         else:
             self.start_macro()
+    
+    def toggle_pause(self):
+        """Macro'yu duraklat/devam ettir (F10 ile)"""
+        if self.is_running:
+            self.pause_macro()
     
     def on_closing(self):
         """Pencere kapatma olayı"""

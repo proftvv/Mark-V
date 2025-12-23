@@ -1,5 +1,22 @@
 # Versiyon Geçmişi
 
+## v1.0.1 (23 Aralık 2025)
+
+### Değişiklikler:
+- 🎮 **F10 Hotkey eklendi**
+  - F10 tuşu ile duraklat/devam
+  - Çalışırken hızlı duraklat için kısayol
+  - F9: Başlat/Durdur
+  - F10: Duraklat/Devam
+- 📝 **UI güncelleme**
+  - Kısayol bilgisi genişletildi
+  - Her iki hotkey de gösteriliyor
+
+### Teknik Detaylar:
+- `toggle_pause()` fonksiyonu eklendi
+- F10 Key.f10 kontrolü
+- Hotkey listener'da iki tuş desteği
+
 ## v1.0.0 - Stable Release 🎉 (23 Aralık 2025)
 
 ### İlk Stabil Sürüm
