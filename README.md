@@ -87,7 +87,7 @@ Detaylı versiyon geçmişi için [VERSION.md](VERSION.md) dosyasına bakınız.
 
 ## 🛠️ Geliştirme
 
-Bu proje aktif olarak geliştirilmektedir. Önerileriniz için issue açabilirsiniz.
+Bu proje aktif olarak geliştirilmemektedir. Önerileriniz için issue açabilirsiniz.
 
 ## ⚠️ Uyarı
 
